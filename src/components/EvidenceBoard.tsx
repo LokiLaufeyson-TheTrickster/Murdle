@@ -39,7 +39,7 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
     >
       <div className="evidence-board-container glass-card" onClick={e => e.stopPropagation()}>
         <div className="evidence-header">
-          <h2 className="mono">OMEN CRIMINAL DATABASE</h2>
+          <h2 className="mono">TheDeductionist DOSSIER ACCESS</h2>
           <button className="close-btn" onClick={onClose}><X size={24} /></button>
         </div>
 

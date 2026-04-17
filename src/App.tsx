@@ -137,10 +137,11 @@ const App: React.FC = () => {
     setTimeout(() => setErrorHighlight(null), 2500);
   };
 
-  if (!puzzle) return <div className="loading mono">INITIALIZING ENGINE...</div>;
+  if (!puzzle) return <div className="loading mono">DEDUCTION ENGINE BOOTING...</div>;
+  if (seed === '') return <div className="loading mono">GENERATING SCENARIO...</div>;
 
   return (
-    <div className="game-container">
+    <div className={`game-container theme-${theme}`}>
       <BackgroundParticles />
       
       <TopBar 
@@ -243,10 +244,10 @@ const App: React.FC = () => {
               <p className="mono">
                 {endgameState === 'victory' 
                   ? 'Your deductive reasoning is flawless. The culprit has been secured.' 
-                  : 'Your logic was flawed. The true culprit remains at large, and your rank has been suspended.'}
+                  : 'Your logic was flawed. The true culprit remains at large, and your reputation is on the line.'}
               </p>
               <button className="btn-modern" onClick={() => { setEndgameState('playing'); setSeed(Math.random().toString(36).substring(7).toUpperCase()); }}>
-                NEW ASSIGNMENT
+                NEXT ASSIGNMENT
               </button>
             </div>
           </motion.div>
@@ -311,6 +312,68 @@ const App: React.FC = () => {
         @media (max-width: 1200px) {
           .game-main { grid-template-columns: 1fr; }
           .game-main .unified-grid-container { height: 60vh; }
+        }
+
+        /* Dynamic Theme Overrides */
+        .theme-Modern {
+          --bg-color: #03040a;
+          --accent-primary: #00d2ff;
+          --accent-secondary: #9d50bb;
+          --accent-glow: rgba(0, 210, 255, 0.3);
+          --accent-purple-glow: rgba(157, 80, 187, 0.3);
+          --surface-1: rgba(10, 12, 20, 0.6);
+          --surface-2: rgba(25, 28, 45, 0.8);
+        }
+
+        .theme-Noir {
+          --bg-color: #0d0d0d;
+          --accent-primary: #e6e6e6;
+          --accent-secondary: #ff3333;
+          --accent-glow: rgba(255, 255, 255, 0.1);
+          --accent-purple-glow: rgba(255, 51, 51, 0.15);
+          --surface-1: rgba(30,30,30, 0.7);
+          --surface-2: rgba(45,45,45, 0.9);
+          --text-main: #d1d1d1;
+          --border-bright: rgba(255,255,255,0.1);
+        }
+
+        .theme-Fantasy {
+          --bg-color: #1a0b2e;
+          --accent-primary: #f9d423;
+          --accent-secondary: #21e6c1;
+          --accent-glow: rgba(249, 212, 35, 0.2);
+          --accent-purple-glow: rgba(33, 230, 193, 0.2);
+          --surface-1: rgba(45, 20, 80, 0.6);
+          --surface-2: rgba(60, 30, 100, 0.8);
+          --text-main: #e8dff5;
+        }
+
+        .game-container::before {
+          content: '';
+          position: fixed;
+          top: 0; left: 0; right: 0; bottom: 0;
+          pointer-events: none;
+          z-index: -1;
+          background: 
+            radial-gradient(circle at 10% 10%, var(--accent-glow) 0%, transparent 40%),
+            radial-gradient(circle at 90% 90%, var(--accent-purple-glow) 0%, transparent 40%);
+          opacity: 0.6;
+          transition: all 1s ease;
+        }
+
+        .game-main {
+          background: radial-gradient(circle at center, rgba(255,255,255,0.02) 0%, transparent 70%);
+          position: relative;
+        }
+        .game-main::after {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+          background-size: 100% 2px, 3px 100%;
+          pointer-events: none;
+          z-index: 5;
+          opacity: 0.3;
         }
       `}} />
     </div>

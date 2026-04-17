@@ -49,8 +49,8 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
     <div className="unified-grid-container glass-card">
       <div className="scroll-wrapper">
         <div className="grid-master-layout" style={{ 
-          gridTemplateColumns: `140px repeat(${size * 2}, 48px)`,
-          gridTemplateRows: `140px repeat(${size * 2}, 48px)`
+          gridTemplateColumns: `160px repeat(${size * 2}, 52px)`,
+          gridTemplateRows: `160px repeat(${size * 2}, 52px)`
         }}>
           {/* Top-Left Corner */}
           <div className="corner-label glass" style={{ borderRight: '3px solid var(--grid-line-bold)', borderBottom: '3px solid var(--grid-line-bold)' }}></div>
@@ -104,12 +104,16 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
 
       <style dangerouslySetInnerHTML={{ __html: `
         .unified-grid-container {
-          margin: 20px;
+          margin: 0;
           overflow: hidden;
           display: flex;
           flex-direction: column;
-          height: calc(100vh - 120px);
-          box-shadow: 0 0 50px rgba(0,0,0,0.5);
+          height: 100%;
+          border: none;
+          background: transparent;
+          box-shadow: none;
+          justify-content: center;
+          align-items: center;
         }
         .scroll-wrapper {
           overflow: auto;
@@ -118,7 +122,39 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
         .grid-master-layout {
           display: grid;
           width: fit-content;
-          background: rgba(0,0,0,0.2);
+          background: rgba(0,0,0,0.4);
+          border: 4px solid var(--grid-line-bold);
+          border-radius: 8px;
+          margin: auto;
+          position: relative;
+        }
+        /* Forensic corner marker */
+        .grid-master-layout::before {
+          content: 'CASE EVIDENCE #EF-402';
+          position: absolute;
+          top: -30px;
+          left: 0;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.7rem;
+          color: var(--accent-primary);
+          opacity: 0.6;
+          letter-spacing: 2px;
+        }
+        /* Confidential watermark */
+        .grid-master-layout::after {
+          content: 'CONFIDENTIAL';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) rotate(-30deg);
+          font-family: 'Outfit', sans-serif;
+          font-weight: 900;
+          font-size: 6rem;
+          color: var(--error);
+          opacity: 0.05;
+          pointer-events: none;
+          z-index: 0;
+          white-space: nowrap;
         }
         .header-cell {
           background: rgba(255,255,255,0.03);
@@ -128,12 +164,14 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
           position: relative;
         }
         .header-cell.top {
-          height: 140px;
+          height: 160px;
+          background: rgba(255,255,255,0.05);
         }
         .header-cell.side {
-          width: 140px;
+          width: 160px;
           justify-content: flex-end;
           padding-right: 12px;
+          background: rgba(255,255,255,0.05);
         }
         .header-content.top {
           display: flex;
@@ -157,17 +195,19 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
           text-align: right;
         }
         .header-cell .label {
-          font-size: 0.6rem;
-          color: var(--text-dim);
+          font-size: 0.9rem;
+          color: var(--text-main);
           text-transform: uppercase;
           max-width: 130px;
           overflow: hidden;
           text-overflow: ellipsis;
+          font-weight: 800;
+          letter-spacing: 0.5px;
         }
         
         .grid-cell {
-          width: 48px;
-          height: 48px;
+          width: 52px;
+          height: 52px;
           display: flex;
           align-items: center;
           justify-content: center;

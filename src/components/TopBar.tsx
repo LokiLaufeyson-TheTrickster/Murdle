@@ -34,7 +34,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   return (
     <div className="top-bar glass">
       <div className="brand-section">
-        <h1 className="logo-text">OMEN <span className="logo-v">v3.2</span></h1>
+        <h1 className="logo-text">TheDeductionist <span className="logo-v">v4.0 Alpha</span></h1>
         <div className="badges-row">
           <div className="badge seed mono">{seed}</div>
           <div className="badge status mono success">DETERMINISTIC</div>
@@ -107,7 +107,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         .logo-text {
           font-family: 'Outfit', sans-serif;
           font-weight: 800;
-          font-size: 1.6rem;
+          font-size: 1.8rem;
           letter-spacing: -1px;
           background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
           -webkit-background-clip: text;
