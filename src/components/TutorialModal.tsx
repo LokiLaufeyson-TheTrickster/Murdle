@@ -1,10 +1,98 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronRight, ChevronLeft, Check } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft } from 'lucide-react';
 
 interface TutorialModalProps {
   onClose: () => void;
 }
+
+// A small self-contained grid for tutorial purposes
+const TutorialGrid: React.FC<{
+  rowLabels: string[];
+  colLabels: string[];
+  cells: number[][]; // 0=empty, 1=X, 2=check
+  highlightCell?: [number, number];
+}> = ({ rowLabels, colLabels, cells, highlightCell }) => {
+  const CELL = 52;
+  const HEADER = 100;
+  return (
+    <div style={{ overflowX: 'auto', display: 'flex', justifyContent: 'center' }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: `${HEADER}px repeat(${colLabels.length}, ${CELL}px)`,
+        gridTemplateRows: `${HEADER}px repeat(${rowLabels.length}, ${CELL}px)`,
+        border: '3px solid rgba(255,255,255,0.2)',
+        borderRadius: 8,
+        overflow: 'hidden',
+        width: 'fit-content',
+      }}>
+        {/* Corner */}
+        <div style={{ background: 'rgba(255,255,255,0.03)', borderRight: '3px solid rgba(255,255,255,0.2)', borderBottom: '3px solid rgba(255,255,255,0.2)' }} />
+        {/* Column headers */}
+        {colLabels.map((label, ci) => (
+          <div key={ci} style={{
+            background: 'rgba(255,255,255,0.06)',
+            borderRight: `${ci < colLabels.length - 1 ? '1px' : '0'} solid rgba(255,255,255,0.1)`,
+            borderBottom: '3px solid rgba(255,255,255,0.2)',
+            display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+            paddingBottom: 8,
+          }}>
+            <span style={{
+              writingMode: 'vertical-rl',
+              transform: 'rotate(180deg)',
+              fontSize: '0.72rem',
+              fontFamily: "'JetBrains Mono', monospace",
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              fontWeight: 400,
+              color: 'var(--text-main)',
+            }}>{label}</span>
+          </div>
+        ))}
+        {/* Rows */}
+        {rowLabels.map((label, ri) => (
+          <React.Fragment key={ri}>
+            {/* Row header */}
+            <div style={{
+              background: 'rgba(255,255,255,0.06)',
+              borderRight: '3px solid rgba(255,255,255,0.2)',
+              borderBottom: `${ri < rowLabels.length - 1 ? '1px' : '0'} solid rgba(255,255,255,0.1)`,
+              display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+              paddingRight: 10, gap: 6,
+            }}>
+              <span style={{
+                fontSize: '0.72rem',
+                fontFamily: "'JetBrains Mono', monospace",
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                fontWeight: 400,
+                color: 'var(--text-main)',
+              }}>{label}</span>
+            </div>
+            {/* Cells */}
+            {colLabels.map((_, ci) => {
+              const val = cells[ri]?.[ci] ?? 0;
+              const isHL = highlightCell && highlightCell[0] === ri && highlightCell[1] === ci;
+              return (
+                <div key={ci} style={{
+                  width: CELL, height: CELL,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  borderRight: `${ci < colLabels.length - 1 ? '1px' : '0'} solid rgba(255,255,255,0.08)`,
+                  borderBottom: `${ri < rowLabels.length - 1 ? '1px' : '0'} solid rgba(255,255,255,0.08)`,
+                  background: isHL ? 'rgba(255,200,0,0.12)' : val === 2 ? 'rgba(0,255,163,0.08)' : val === 1 ? 'rgba(255,45,85,0.05)' : 'rgba(255,255,255,0.01)',
+                  outline: isHL ? '2px solid rgba(255,200,0,0.5)' : 'none',
+                }}>
+                  {val === 1 && <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--error)', opacity: 0.85 }}>✕</span>}
+                  {val === 2 && <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--success)', textShadow: '0 0 10px var(--success)' }}>✓</span>}
+                </div>
+              );
+            })}
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
   const [step, setStep] = useState(0);
@@ -12,120 +100,153 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
   const slides = [
     {
       title: "THE BASICS",
-      content: "Welcome, Detective! Your goal is to find out **WHO** did it, with **WHAT**, and **WHERE**. Every puzzle has exactly one correct answer.",
-      example: (
-        <div className="tutorial-grid-box">
-          <div className="mini-grid">
-            <div className="m-cell header"></div>
-            <div className="m-cell header">KNIFE</div>
-            <div className="m-cell header side">VICTOR</div>
-            <div className="m-cell check">✓</div>
+      text: (<>Welcome, Detective. Your job: figure out <strong>WHO</strong> did it, with <strong>WHAT</strong> weapon, and <strong>WHERE</strong>. Every puzzle has exactly one correct answer. You use the grid to track what's possible and what isn't.</>),
+      caption: "Each row is a suspect (or weapon). Each column is a weapon (or location). Cells track what goes together.",
+      grid: (
+        <TutorialGrid
+          rowLabels={['Victor', 'Dana', 'Rosa']}
+          colLabels={['Knife', 'Poison', 'Gun']}
+          cells={[[0,0,0],[0,0,0],[0,0,0]]}
+        />
+      )
+    },
+    {
+      title: "MARKING A MATCH (✓)",
+      text: (<>Click a cell twice to place a <strong>Check (✓)</strong>. This means those two things are <strong>definitely linked</strong>. Place one and the grid auto-fills the rest of the row and column with <strong>X</strong>s — because a suspect can only have one weapon.</>),
+      caption: "Victor has the Knife. So he can't have Poison or the Gun. And nobody else has the Knife.",
+      grid: (
+        <TutorialGrid
+          rowLabels={['Victor', 'Dana', 'Rosa']}
+          colLabels={['Knife', 'Poison', 'Gun']}
+          cells={[[2,1,1],[1,0,0],[1,0,0]]}
+          highlightCell={[0,0]}
+        />
+      )
+    },
+    {
+      title: "CROSSING OUT (✕)",
+      text: (<>Click a cell once to place an <strong>X (✕)</strong>. This means these two things are <strong>impossible</strong> to pair. Use clues to eliminate options. As you eliminate enough, the truth becomes obvious.</>),
+      caption: "A clue says 'Dana was not near the Poison'. Cross it out. Now Dana can only have the Knife or the Gun.",
+      grid: (
+        <TutorialGrid
+          rowLabels={['Victor', 'Dana', 'Rosa']}
+          colLabels={['Knife', 'Poison', 'Gun']}
+          cells={[[2,1,1],[1,1,0],[1,0,0]]}
+          highlightCell={[1,1]}
+        />
+      )
+    },
+    {
+      title: "CONNECTING THE DOTS",
+      text: (<>The puzzle has <strong>three grids</strong>: Suspects × Weapons, Weapons × Locations, and Suspects × Locations. Info from one grid unlocks info in another. Chain them to close the case.</>),
+      caption: "Victor has the Knife → The Knife was in the Library → Therefore Victor was in the Library.",
+      grid: (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <div>
+              <p style={{ fontSize: '0.65rem', color: 'var(--text-dim)', textAlign: 'center', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 1 }}>Suspects × Weapons</p>
+              <TutorialGrid
+                rowLabels={['Victor']}
+                colLabels={['Knife']}
+                cells={[[2]]}
+              />
+            </div>
+            <span style={{ fontSize: '2rem', color: 'var(--accent-primary)' }}>+</span>
+            <div>
+              <p style={{ fontSize: '0.65rem', color: 'var(--text-dim)', textAlign: 'center', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 1 }}>Weapons × Locations</p>
+              <TutorialGrid
+                rowLabels={['Knife']}
+                colLabels={['Library']}
+                cells={[[2]]}
+              />
+            </div>
+            <span style={{ fontSize: '2rem', color: 'var(--success)' }}>→</span>
+            <div>
+              <p style={{ fontSize: '0.65rem', color: 'var(--text-dim)', textAlign: 'center', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 1 }}>Result</p>
+              <TutorialGrid
+                rowLabels={['Victor']}
+                colLabels={['Library']}
+                cells={[[2]]}
+              />
+            </div>
           </div>
-          <p className="eli5">If you find a <strong>Check (✓)</strong>, it means Victor has the Knife. This also means Victor has <strong>NO OTHER</strong> weapon, and <strong>NOBODY ELSE</strong> has the Knife!</p>
         </div>
       )
     },
     {
-      title: "CROSSING OUT",
-      content: "Use the **X** to mark things that are impossible. This is your most powerful tool!",
-      example: (
-        <div className="tutorial-grid-box">
-          <div className="mini-grid">
-            <div className="m-cell header"></div>
-            <div className="m-cell header">POISON</div>
-            <div className="m-cell header">GUN</div>
-            <div className="m-cell header side">DANA</div>
-            <div className="m-cell x">✕</div>
-            <div className="m-cell"></div>
-          </div>
-          <p className="eli5">A clue says: 'Dana hates Poison.' So we put an <strong>X</strong> there. Dana might have the Gun, but she definitely doesn't have the Poison!</p>
-        </div>
-      )
-    },
-    {
-      title: "SMART CONNECTIONS",
-      content: "Connect the dots! If you know two things, you might find a third.",
-      example: (
-        <div className="tutorial-grid-box">
-          <div className="logic-row">
-            <div className="logic-item">VICTOR <Check size={12}/> LIBRARY</div>
-            <div className="plus">+</div>
-            <div className="logic-item">LIBRARY <Check size={12}/> KNIFE</div>
-            <div className="arrow">→</div>
-            <div className="logic-item result">VICTOR <Check size={12}/> KNIFE</div>
-          </div>
-          <p className="eli5">If Victor was in the Library, and the Knife was in the Library, then Victor **MUST** have the Knife! The grid will help you see these links.</p>
-        </div>
-      )
-    },
-    {
-      title: "READY TO SOLVE?",
-      content: "When you are 100% sure, click **FILE ACCUSATION** in the top bar. One mistake and the case is lost!",
-      example: (
-        <div className="final-slide">
-          <div className="big-icon-circle">
-            <Check size={48} color="var(--success)" />
-          </div>
-          <p className="eli5">Trust your logic, not your gut. Good luck, Detective!</p>
-        </div>
+      title: "FILING YOUR ACCUSATION",
+      text: (<>When you've deduced all three answers — <strong>culprit</strong>, <strong>weapon</strong>, and <strong>location</strong> — click <strong>FILE ACCUSATION</strong> in the top bar. You only get one shot. Make sure your grid is complete before accusing.</>),
+      caption: "Wrong accusation = CASE CLOSED AGAINST YOU. Don't guess. Deduce.",
+      grid: (
+        <TutorialGrid
+          rowLabels={['Victor', 'Dana', 'Rosa']}
+          colLabels={['Library', 'Garden', 'Cellar']}
+          cells={[[2,1,1],[1,1,2],[1,2,1]]}
+        />
       )
     }
   ];
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="tutorial-overlay glass"
+      className="tutorial-overlay"
       onClick={onClose}
     >
-      <motion.div 
-        initial={{ scale: 0.9, opacity: 0 }}
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         className="tutorial-card glass-card"
         onClick={e => e.stopPropagation()}
       >
-        <div className="tutorial-header">
-          <h2 className="mono">ACADEMY TRAINING</h2>
-          <button className="close-btn" onClick={onClose}><X size={24} /></button>
+        <div className="tut-header">
+          <h2 className="mono">DETECTIVE ACADEMY — <span style={{ color: 'var(--accent-primary)' }}>CASE {step + 1} / {slides.length}</span></h2>
+          <button className="tut-close" onClick={onClose}><X size={20} /></button>
         </div>
 
-        <div className="tutorial-content-wrapper">
+        <div className="tut-body">
           <AnimatePresence mode="wait">
-            <motion.div 
+            <motion.div
               key={step}
-              initial={{ x: 20, opacity: 0 }}
+              initial={{ x: 30, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -20, opacity: 0 }}
-              className="slide-content"
+              exit={{ x: -30, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="tut-slide"
             >
-              <h3 className="slide-title">{slides[step].title}</h3>
-              <p className="slide-text" dangerouslySetInnerHTML={{ __html: slides[step].content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
-              <div className="slide-example">{slides[step].example}</div>
+              <h3 className="tut-title mono">{slides[step].title}</h3>
+              <p className="tut-text">{slides[step].text}</p>
+              <div className="tut-grid-area">
+                {slides[step].grid}
+                {slides[step].caption && (
+                  <p className="tut-caption">{slides[step].caption}</p>
+                )}
+              </div>
             </motion.div>
           </AnimatePresence>
         </div>
 
-        <div className="tutorial-footer">
-          <div className="step-indicator">
+        <div className="tut-footer">
+          <div className="tut-dots">
             {slides.map((_, i) => (
-              <div key={i} className={`dot ${step === i ? 'active' : ''}`} onClick={() => setStep(i)} />
+              <button key={i} className={`tut-dot${step === i ? ' active' : ''}`} onClick={() => setStep(i)} />
             ))}
           </div>
-          <div className="nav-buttons">
+          <div className="tut-nav">
             {step > 0 && (
-              <button className="nav-btn" onClick={() => setStep(s => s - 1)}>
-                <ChevronLeft size={20} /> BACK
+              <button className="tut-btn" onClick={() => setStep(s => s - 1)}>
+                <ChevronLeft size={16} /> BACK
               </button>
             )}
             {step < slides.length - 1 ? (
-              <button className="nav-btn primary" onClick={() => setStep(s => s + 1)}>
-                NEXT <ChevronRight size={20} />
+              <button className="tut-btn primary" onClick={() => setStep(s => s + 1)}>
+                NEXT <ChevronRight size={16} />
               </button>
             ) : (
-              <button className="nav-btn success" onClick={onClose}>
-                UNDERSTOOD
+              <button className="tut-btn success" onClick={onClose}>
+                BEGIN INVESTIGATION
               </button>
             )}
           </div>
@@ -135,85 +256,83 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
       <style dangerouslySetInnerHTML={{ __html: `
         .tutorial-overlay {
           position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0,0,0,0.9);
+          background: rgba(0,0,0,0.92);
           z-index: 6000;
           display: flex; align-items: center; justify-content: center;
           padding: 20px;
         }
         .tutorial-card {
-          width: 100%;
-          max-width: 800px;
-          height: auto;
-          display: flex;
-          flex-direction: column;
-          padding: 60px;
-          gap: 40px;
-          border: 1px solid var(--accent-primary);
+          width: 100%; max-width: 860px;
+          display: flex; flex-direction: column;
+          border: 1px solid var(--accent-primary) !important;
+          box-shadow: 0 0 60px rgba(0,210,255,0.1);
+          overflow: hidden;
         }
-        .tutorial-header {
+        .tut-header {
           display: flex; justify-content: space-between; align-items: center;
+          padding: 20px 28px; border-bottom: 1px solid rgba(255,255,255,0.08);
         }
-        .tutorial-header h2 { color: var(--accent-primary); letter-spacing: 2px; font-size: 1.2rem; }
+        .tut-header h2 { font-size: 0.85rem; letter-spacing: 2px; }
+        .tut-close {
+          background: none; border: none; cursor: pointer;
+          color: var(--text-dim); padding: 4px;
+          border-radius: 4px; transition: color 0.2s;
+        }
+        .tut-close:hover { color: var(--error); }
 
-        .slide-content {
-          display: flex; flex-direction: column; gap: 20px;
+        .tut-body { padding: 28px; overflow-y: auto; max-height: 70vh; }
+        .tut-slide { display: flex; flex-direction: column; gap: 20px; }
+        .tut-title { font-size: 1.6rem; letter-spacing: 2px; color: var(--text-bright); }
+        .tut-text {
+          font-size: 1rem; line-height: 1.7;
+          color: var(--text-main);
         }
-        .slide-title { font-size: 1.8rem; font-weight: 800; }
-        .slide-text { line-height: 1.6; color: var(--text-main); font-size: 1.1rem; }
-        
-        .tutorial-grid-box {
-          background: rgba(0,0,0,0.3);
-          padding: 24px;
+        .tut-text strong { color: var(--accent-primary); font-weight: 700; }
+        .tut-grid-area {
+          background: rgba(0,0,0,0.4);
+          border: 1px solid rgba(255,255,255,0.07);
           border-radius: 12px;
-          border: 1px solid var(--border-dim);
-          margin-top: 10px;
+          padding: 24px;
+          display: flex; flex-direction: column; gap: 16px;
         }
-        .mini-grid {
-          display: grid;
-          grid-template-columns: 80px 80px 80px;
-          grid-template-rows: 80px 80px;
-          gap: 4px;
-          margin-bottom: 20px;
-          justify-content: center;
+        .tut-caption {
+          font-size: 0.82rem;
+          color: var(--text-dim);
+          border-left: 3px solid var(--accent-secondary);
+          padding-left: 12px;
+          font-style: italic;
+          line-height: 1.5;
         }
-        .m-cell {
-          background: rgba(255,255,255,0.05);
-          display: flex; align-items: center; justify-content: center;
-          font-weight: 800;
-          border-radius: 4px;
-        }
-        .m-cell.header { font-size: 0.8rem; color: var(--text-dim); background: transparent; font-weight: 700; }
-        .m-cell.header.side { justify-content: flex-end; padding-right: 8px; font-family: 'Special Elite', cursive; }
-        .m-cell.check { color: var(--success); font-size: 2.5rem; background: rgba(0,255,163,0.1); border: 2px solid var(--success); }
-        .m-cell.x { color: var(--error); font-size: 2.5rem; background: rgba(255,45,85,0.1); border: 2px solid var(--error); }
-        
-        .eli5 { font-size: 0.9rem; color: var(--text-dim); border-left: 3px solid var(--accent-secondary); padding-left: 12px; font-style: italic; }
 
-        .logic-row {
-          display: flex; align-items: center; gap: 12px; justify-content: center; margin-bottom: 20px;
-        }
-        .logic-item { padding: 8px 12px; background: rgba(255,255,255,0.05); border-radius: 6px; font-size: 0.8rem; font-weight: 700; }
-        .logic-item.result { border: 1px solid var(--success); color: var(--success); }
-        
-        .tutorial-footer {
+        .tut-footer {
           display: flex; justify-content: space-between; align-items: center;
-          margin-top: 20px; padding-top: 24px; border-top: 1px solid var(--border-dim);
+          padding: 16px 28px; border-top: 1px solid rgba(255,255,255,0.08);
         }
-        .step-indicator { display: flex; gap: 8px; }
-        .step-indicator .dot { width: 8px; height: 8px; background: var(--border-bright); border-radius: 50%; cursor: pointer; }
-        .step-indicator .dot.active { background: var(--accent-primary); width: 24px; border-radius: 4px; }
-        
-        .nav-buttons { display: flex; gap: 12px; }
-        .nav-btn {
-          padding: 10px 20px; border-radius: 8px; font-weight: 700; border: 1px solid var(--border-bright); background: transparent; color: var(--text-main); cursor: pointer;
-          display: flex; align-items: center; gap: 8px;
+        .tut-dots { display: flex; gap: 8px; align-items: center; }
+        .tut-dot {
+          width: 8px; height: 8px; border-radius: 50%;
+          background: rgba(255,255,255,0.2); border: none; cursor: pointer;
+          transition: all 0.2s;
         }
-        .nav-btn.primary { background: var(--accent-primary); color: var(--bg-color); border: none; }
-        .nav-btn.success { background: var(--success); color: var(--bg-color); border: none; }
-        
-        .big-icon-circle {
-          width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--success); display: flex; align-items: center; justify-content: center; margin: 0 auto 30px;
-          background: rgba(0,255,163,0.05);
+        .tut-dot.active { background: var(--accent-primary); width: 22px; border-radius: 4px; }
+
+        .tut-nav { display: flex; gap: 10px; }
+        .tut-btn {
+          display: flex; align-items: center; gap: 6px;
+          padding: 10px 20px; border-radius: 8px;
+          font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+          font-weight: 700; letter-spacing: 1px;
+          border: 1px solid rgba(255,255,255,0.15);
+          background: transparent; color: var(--text-main); cursor: pointer;
+          transition: all 0.2s;
+        }
+        .tut-btn:hover { background: rgba(255,255,255,0.08); }
+        .tut-btn.primary {
+          background: var(--accent-primary); color: var(--bg-color); border-color: transparent;
+        }
+        .tut-btn.primary:hover { opacity: 0.85; }
+        .tut-btn.success {
+          background: var(--success); color: var(--bg-color); border-color: transparent;
         }
       `}} />
     </motion.div>

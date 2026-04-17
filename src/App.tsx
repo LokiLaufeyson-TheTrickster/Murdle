@@ -415,8 +415,10 @@ const App: React.FC = () => {
         }
 
         .handwritten {
-          font-family: 'Outfit', sans-serif;
-          font-weight: 800;
+          font-family: 'JetBrains Mono', monospace;
+          text-transform: uppercase;
+          font-weight: 400;
+          letter-spacing: 1px;
         }
       `}} />
     </div>

@@ -184,8 +184,9 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
           max-width: 130px;
           overflow: hidden;
           text-overflow: ellipsis;
-          font-weight: 800;
-          letter-spacing: 0.5px;
+          font-weight: 400;
+          text-transform: uppercase;
+          letter-spacing: 1px;
         }
         
         .grid-cell {
