@@ -414,10 +414,9 @@ const App: React.FC = () => {
           opacity: 0.3;
         }
 
-        /* Handwriting font (Typewriter style for better detective feel) */
-        @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
         .handwritten {
-          font-family: 'Special Elite', cursive;
+          font-family: 'Outfit', sans-serif;
+          font-weight: 800;
         }
       `}} />
     </div>
