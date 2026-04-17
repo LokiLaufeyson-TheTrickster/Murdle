@@ -36,7 +36,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   return (
     <div className="top-bar glass">
       <div className="brand-section">
-        <h1 className="logo-text whimsy-highlight">TheDeductionist</h1>
+        <h1 className="logo-text">TheDeductionist</h1>
         <div className="badges-row">
           <div className="badge seed mono">{seed}</div>
         </div>
@@ -162,6 +162,10 @@ export const TopBar: React.FC<TopBarProps> = ({
           cursor: pointer;
           transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           border: 1px solid var(--border-bright);
+          color: var(--text-bright);
+        }
+        .btn-modern.secondary {
+          color: var(--text-bright);
         }
         .btn-modern.hypothesis {
           background: linear-gradient(135deg, rgba(255, 45, 85, 0.2), rgba(157, 80, 187, 0.2));

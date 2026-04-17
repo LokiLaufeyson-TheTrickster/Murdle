@@ -412,27 +412,10 @@ const App: React.FC = () => {
           opacity: 0.3;
         }
 
-        /* Whimsical Utility Styles */
-        .whimsy-highlight {
-          position: relative;
-          display: inline-block;
-        }
-        .whimsy-highlight::after {
-          content: "";
-          position: absolute;
-          left: -5%; width: 110%;
-          bottom: 2px; height: 30%;
-          background: var(--accent-primary);
-          opacity: 0.2;
-          z-index: -1;
-          transform: rotate(-2deg);
-          border-radius: 100% 10% 80% 5%;
-        }
-        
-        /* Handwriting font for specific notes */
-        @import url('https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap');
+        /* Handwriting font (Typewriter style for better detective feel) */
+        @import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
         .handwritten {
-          font-family: 'Indie+Flower', cursive;
+          font-family: 'Special Elite', cursive;
         }
       `}} />
     </div>

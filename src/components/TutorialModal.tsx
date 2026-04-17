@@ -21,7 +21,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
             <div className="m-cell header side">VICTOR</div>
             <div className="m-cell check">✓</div>
           </div>
-          <p className="eli5">If you find a **Check (✓)**, it means Victor has the Knife. This also means Victor has **NO OTHER** weapon, and **NOBODY ELSE** has the Knife!</p>
+          <p className="eli5">If you find a <strong>Check (✓)</strong>, it means Victor has the Knife. This also means Victor has <strong>NO OTHER</strong> weapon, and <strong>NOBODY ELSE</strong> has the Knife!</p>
         </div>
       )
     },
@@ -38,7 +38,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
             <div className="m-cell x">✕</div>
             <div className="m-cell"></div>
           </div>
-          <p className="eli5">A clue says: 'Dana hates Poison.' So we put an **X** there. Dana might have the Gun, but she definitely doesn't have the Poison!</p>
+          <p className="eli5">A clue says: 'Dana hates Poison.' So we put an <strong>X</strong> there. Dana might have the Gun, but she definitely doesn't have the Poison!</p>
         </div>
       )
     },
@@ -142,12 +142,12 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
         }
         .tutorial-card {
           width: 100%;
-          max-width: 600px;
+          max-width: 800px;
           height: auto;
           display: flex;
           flex-direction: column;
-          padding: 40px;
-          gap: 32px;
+          padding: 60px;
+          gap: 40px;
           border: 1px solid var(--accent-primary);
         }
         .tutorial-header {
@@ -182,10 +182,10 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ onClose }) => {
           font-weight: 800;
           border-radius: 4px;
         }
-        .m-cell.header { font-size: 0.7rem; color: var(--text-dim); background: transparent; }
-        .m-cell.header.side { justify-content: flex-end; padding-right: 8px; }
-        .m-cell.check { color: var(--success); font-size: 2rem; background: rgba(0,255,163,0.1); }
-        .m-cell.x { color: var(--error); font-size: 2rem; background: rgba(255,45,85,0.1); }
+        .m-cell.header { font-size: 0.8rem; color: var(--text-dim); background: transparent; font-weight: 700; }
+        .m-cell.header.side { justify-content: flex-end; padding-right: 8px; font-family: 'Special Elite', cursive; }
+        .m-cell.check { color: var(--success); font-size: 2.5rem; background: rgba(0,255,163,0.1); border: 2px solid var(--success); }
+        .m-cell.x { color: var(--error); font-size: 2.5rem; background: rgba(255,45,85,0.1); border: 2px solid var(--error); }
         
         .eli5 { font-size: 0.9rem; color: var(--text-dim); border-left: 3px solid var(--accent-secondary); padding-left: 12px; font-style: italic; }
 
