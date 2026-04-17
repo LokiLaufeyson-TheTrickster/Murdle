@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Play, BookOpen, Settings, Ghost } from 'lucide-react';
+import { Play, BookOpen, Ghost } from 'lucide-react';
 
 interface StartMenuProps {
   onStart: () => void;
