@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg-color: #03040a;
+  --surface-1: rgba(10, 12, 20, 0.4);
+  --surface-2: rgba(25, 28, 45, 0.6);
+  --accent-primary: #00d2ff;
+  --accent-secondary: #9d50bb;
+  --accent-glow: rgba(0, 210, 255, 0.3);
+  --accent-purple-glow: rgba(157, 80, 187, 0.3);
+  --text-main: #f0f0f5;
+  --text-dim: #9aa0b0;
+  --text-bright: #ffffff;
+  --border-dim: rgba(255, 255, 255, 0.05);
+  --border-bright: rgba(255, 255, 255, 0.15);
+  --error: #ff2d55;
+  --success: #00ffa3;
+  --grid-line: rgba(255, 255, 255, 0.08);
+  --grid-line-bold: rgba(255, 255, 255, 0.25);
+  --blur: 20px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  background-image: 
+    radial-gradient(circle at 20% 20%, var(--accent-glow) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, var(--accent-purple-glow) 0%, transparent 40%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
+  z-index: 10;
+}
+
+/* Glassmorphism */
+.glass {
+  background: var(--surface-1);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid var(--border-bright);
+}
+
+.glass-card {
+  background: var(--surface-2);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid var(--border-dim);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Particle Background Setup */
+#particles-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Webkit Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-bright);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
