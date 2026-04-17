@@ -64,6 +64,8 @@ export const StartMenu: React.FC<StartMenuProps> = ({ onStart, onOpenTutorial })
           background: radial-gradient(circle at center, var(--accent-glow) 0%, transparent 50%);
           opacity: 0.2;
           animation: rotateBg 20s linear infinite;
+          pointer-events: none;
+          z-index: 1;
         }
         @keyframes rotateBg {
           from { transform: rotate(0deg); }
@@ -81,6 +83,8 @@ export const StartMenu: React.FC<StartMenuProps> = ({ onStart, onOpenTutorial })
           text-align: center;
           border: 1px solid var(--border-bright);
           box-shadow: 0 0 100px rgba(0,210,255,0.1);
+          position: relative;
+          z-index: 10;
         }
 
         .logo-text.large {
