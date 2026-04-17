@@ -161,7 +161,7 @@ const App: React.FC = () => {
             onStart={() => setGameState('playing')} 
             onOpenTutorial={() => setShowTutorial(true)} 
           />
-        ) : (
+        ) : puzzle ? (
           <motion.div 
             key="game"
             initial={{ opacity: 0 }}
@@ -199,6 +199,8 @@ const App: React.FC = () => {
               />
             </main>
           </motion.div>
+        ) : (
+          <div className="loading mono">INITIALIZING ENGINE...</div>
         )}
       </AnimatePresence>
 
