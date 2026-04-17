@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // v4.1 Build
 import type { Difficulty, Puzzle } from './engine/types';
 import { generatePuzzle } from './engine/generator';
 import { getNarrative } from './engine/narrative';
