@@ -15,6 +15,7 @@ interface TopBarProps {
   onUseContradiction: () => void;
   onOpenDatabase: () => void;
   onOpenAccuse: () => void;
+  onBackToMenu: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({ 
@@ -26,18 +27,18 @@ export const TopBar: React.FC<TopBarProps> = ({
   theme,
   setTheme,
   charges, 
-  onNewGame, 
+  onNewGame,
   onUseContradiction,
   onOpenDatabase,
-  onOpenAccuse
+  onOpenAccuse,
+  onBackToMenu
 }) => {
   return (
     <div className="top-bar glass">
       <div className="brand-section">
-        <h1 className="logo-text">TheDeductionist <span className="logo-v">v4.0 Alpha</span></h1>
+        <h1 className="logo-text whimsy-highlight">TheDeductionist</h1>
         <div className="badges-row">
           <div className="badge seed mono">{seed}</div>
-          <div className="badge status mono success">DETERMINISTIC</div>
         </div>
       </div>
       
@@ -86,6 +87,9 @@ export const TopBar: React.FC<TopBarProps> = ({
         </button>
         <button className="btn-modern icon-only" onClick={onNewGame} title="REGENERATE SEED">
           <RefreshCw size={20} />
+        </button>
+        <button className="btn-modern secondary" onClick={onBackToMenu} style={{ background: 'rgba(255,255,255,0.05)' }}>
+          <span>RETURN TO HQ</span>
         </button>
       </div>
 

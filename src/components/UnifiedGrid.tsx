@@ -59,8 +59,8 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
           {suspects.map((s, i) => (
             <div key={`th-s-${i}`} className="header-cell top" style={{ borderRight: i === size - 1 ? '3px solid var(--grid-line-bold)' : '1px solid var(--grid-line)', borderBottom: '3px solid var(--grid-line-bold)' }}>
               <div className="header-content top">
-                <span className="mono label top-label">{s.name}</span>
-                {renderIcon(s, true)}
+                <span className="handwritten label top-label">{s.name}</span>
+                <div style={{ transform: i % 2 === 0 ? 'rotate(5deg)' : 'rotate(-5deg)' }}>{renderIcon(s, true)}</div>
               </div>
             </div>
           ))}
@@ -69,8 +69,8 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
           {locations.map((l, i) => (
             <div key={`th-l-${i}`} className="header-cell top" style={{ borderRight: i === size - 1 ? '3px solid var(--grid-line-bold)' : '1px solid var(--grid-line)', borderBottom: '3px solid var(--grid-line-bold)' }}>
               <div className="header-content top">
-                <span className="mono label top-label">{l.name}</span>
-                {renderIcon(l)}
+                <span className="handwritten label top-label">{l.name}</span>
+                <div style={{ transform: i % 2 === 0 ? 'rotate(-3deg)' : 'rotate(3deg)' }}>{renderIcon(l)}</div>
               </div>
             </div>
           ))}
@@ -81,8 +81,8 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
               {/* Side Header */}
               <div className="header-cell side" style={{ borderBottom: r === size - 1 ? '3px solid var(--grid-line-bold)' : '1px solid var(--grid-line)', borderRight: '3px solid var(--grid-line-bold)' }}>
                 <div className="header-content side">
-                  <span className="mono label">{r < size ? weapons[r].name : locations[r - size].name}</span>
-                  {r < size ? renderIcon(weapons[r]) : renderIcon(locations[r - size])}
+                  <span className="handwritten label">{r < size ? weapons[r].name : locations[r - size].name}</span>
+                  <div style={{ transform: r % 2 === 0 ? 'rotate(4deg)' : 'rotate(-4deg)' }}>{r < size ? renderIcon(weapons[r]) : renderIcon(locations[r - size])}</div>
                 </div>
               </div>
 
@@ -140,22 +140,6 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
           opacity: 0.6;
           letter-spacing: 2px;
         }
-        /* Confidential watermark */
-        .grid-master-layout::after {
-          content: 'CONFIDENTIAL';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%) rotate(-30deg);
-          font-family: 'Outfit', sans-serif;
-          font-weight: 900;
-          font-size: 6rem;
-          color: var(--error);
-          opacity: 0.05;
-          pointer-events: none;
-          z-index: 0;
-          white-space: nowrap;
-        }
         .header-cell {
           background: rgba(255,255,255,0.03);
           display: flex;
@@ -195,13 +179,12 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
           text-align: right;
         }
         .header-cell .label {
-          font-size: 0.9rem;
+          font-size: 1.1rem;
           color: var(--text-main);
-          text-transform: uppercase;
           max-width: 130px;
           overflow: hidden;
           text-overflow: ellipsis;
-          font-weight: 800;
+          font-weight: 500;
           letter-spacing: 0.5px;
         }
         

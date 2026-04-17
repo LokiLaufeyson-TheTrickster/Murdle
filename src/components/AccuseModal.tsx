@@ -142,6 +142,7 @@ export const AccuseModal: React.FC<AccuseModalProps> = ({
           padding: 16px;
           border-radius: 4px;
           border: 1px solid var(--border-bright);
+          background: var(--surface-2);
           color: var(--text-main);
           font-size: 1rem;
           cursor: pointer;

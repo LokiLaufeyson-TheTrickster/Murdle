@@ -9,6 +9,8 @@ import { BackgroundParticles } from './components/BackgroundParticles';
 import { EvidenceBoard } from './components/EvidenceBoard';
 import { AccuseModal } from './components/AccuseModal';
 import { SolutionWalkthrough } from './components/SolutionWalkthrough';
+import { StartMenu } from './components/StartMenu';
+import { TutorialModal } from './components/TutorialModal';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const App: React.FC = () => {
@@ -24,6 +26,8 @@ const App: React.FC = () => {
   const [showAccuseWindow, setShowAccuseWindow] = useState(false);
   const [showWalkthrough, setShowWalkthrough] = useState(false);
   const [endgameState, setEndgameState] = useState<'playing' | 'victory' | 'defeat'>('playing');
+  const [gameState, setGameState] = useState<'menu' | 'playing'>('menu');
+  const [showTutorial, setShowTutorial] = useState(false);
 
   useEffect(() => {
     const newPuzzle = generatePuzzle(seed, difficulty, size, theme);
@@ -143,35 +147,60 @@ const App: React.FC = () => {
   return (
     <div className={`game-container theme-${theme}`}>
       <BackgroundParticles />
-      
-      <TopBar 
-        seed={seed} 
-        difficulty={difficulty} 
-        setDifficulty={setDifficulty}
-        size={size}
-        setSize={setSize}
-        theme={theme}
-        setTheme={setTheme}
-        charges={charges} 
-        onNewGame={() => { setSeed(Math.random().toString(36).substring(7).toUpperCase()); setEndgameState('playing'); }}
-        onUseContradiction={useContradiction}
-        onOpenDatabase={() => setShowEvidenceBoard(true)}
-        onOpenAccuse={() => setShowAccuseWindow(true)}
-      />
-      
-      <main className="game-main">
-        <UnifiedGrid 
-          puzzle={puzzle}
-          userState={userState}
-          onCellClick={handleCellClick}
-        />
-        
-        <ClueList 
-          clues={puzzle.clues} 
-          contextHtml={contextHtml}
-          onShowWalkthrough={() => setShowWalkthrough(true)}
-        />
-      </main>
+
+      <AnimatePresence>
+        {showTutorial && (
+          <TutorialModal onClose={() => setShowTutorial(false)} />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence mode="wait">
+        {gameState === 'menu' ? (
+          <StartMenu 
+            key="menu"
+            onStart={() => setGameState('playing')} 
+            onOpenTutorial={() => setShowTutorial(true)} 
+          />
+        ) : (
+          <motion.div 
+            key="game"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="game-inner-wrapper"
+          >
+            <TopBar 
+              seed={seed} 
+              difficulty={difficulty} 
+              setDifficulty={setDifficulty}
+              size={size}
+              setSize={setSize}
+              theme={theme}
+              setTheme={setTheme}
+              charges={charges} 
+              onNewGame={() => { setSeed(Math.random().toString(36).substring(7).toUpperCase()); setEndgameState('playing'); }}
+              onUseContradiction={useContradiction}
+              onOpenDatabase={() => setShowEvidenceBoard(true)}
+              onOpenAccuse={() => setShowAccuseWindow(true)}
+              onBackToMenu={() => setGameState('menu')}
+            />
+            
+            <main className="game-main">
+              <UnifiedGrid 
+                puzzle={puzzle}
+                userState={userState}
+                onCellClick={handleCellClick}
+              />
+              
+              <ClueList 
+                clues={puzzle.clues} 
+                contextHtml={contextHtml}
+                onShowWalkthrough={() => setShowWalkthrough(true)}
+              />
+            </main>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {errorHighlight && (
@@ -266,6 +295,13 @@ const App: React.FC = () => {
         }
         .endgame-modal h1 { font-size: 2.5rem; letter-spacing: 4px; }
         
+        .game-inner-wrapper {
+          display: flex;
+          flex-direction: column;
+          height: 100vh;
+          width: 100vw;
+        }
+
         .game-container {
           display: flex;
           flex-direction: column;
@@ -374,6 +410,29 @@ const App: React.FC = () => {
           pointer-events: none;
           z-index: 5;
           opacity: 0.3;
+        }
+
+        /* Whimsical Utility Styles */
+        .whimsy-highlight {
+          position: relative;
+          display: inline-block;
+        }
+        .whimsy-highlight::after {
+          content: "";
+          position: absolute;
+          left: -5%; width: 110%;
+          bottom: 2px; height: 30%;
+          background: var(--accent-primary);
+          opacity: 0.2;
+          z-index: -1;
+          transform: rotate(-2deg);
+          border-radius: 100% 10% 80% 5%;
+        }
+        
+        /* Handwriting font for specific notes */
+        @import url('https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap');
+        .handwritten {
+          font-family: 'Indie+Flower', cursive;
         }
       `}} />
     </div>
