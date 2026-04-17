@@ -179,12 +179,12 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
           text-align: right;
         }
         .header-cell .label {
-          font-size: 1.1rem;
+          font-size: 0.9rem;
           color: var(--text-main);
           max-width: 130px;
           overflow: hidden;
           text-overflow: ellipsis;
-          font-weight: 500;
+          font-weight: 800;
           letter-spacing: 0.5px;
         }
         
