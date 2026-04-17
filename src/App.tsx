@@ -141,8 +141,8 @@ const App: React.FC = () => {
     setTimeout(() => setErrorHighlight(null), 2500);
   };
 
-  if (!puzzle) return <div className="loading mono">DEDUCTION ENGINE BOOTING...</div>;
-  if (seed === '') return <div className="loading mono">GENERATING SCENARIO...</div>;
+  // Show loading mostly for initial data prep
+  if (!puzzle && gameState === 'playing') return <div className="loading mono">DEDUCTION ENGINE BOOTING...</div>;
 
   return (
     <div className={`game-container theme-${theme}`}>
