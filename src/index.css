@@ -119,3 +119,25 @@ body {
 @media (max-width: 600px) {
   .btn-label { display: none; }
 }
+/* Grid Review Mode Error Styles */
+.grid-cell.is-error {
+  background: rgba(255, 45, 85, 0.15) !important;
+  border: 1px solid rgba(255, 45, 85, 0.5) !important;
+  position: relative;
+}
+.grid-cell.is-error .cell-mark {
+  color: var(--error) !important;
+  filter: drop-shadow(0 0 5px var(--error));
+}
+.error-pulse {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border: 2px solid var(--error);
+  border-radius: inherit;
+  animation: pulsate-error 1.5s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes pulsate-error {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.4); opacity: 0; }
+}

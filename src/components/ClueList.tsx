@@ -68,6 +68,16 @@ export const ClueList: React.FC<ClueListProps> = ({
   const [revealedOriginals, setRevealedOriginals] = useState<Record<string, boolean>>({});
   const { geminiApiKey } = useSettings();
 
+  // Reset all states when clues change (new case)
+  React.useEffect(() => {
+    setCrossedOut({});
+    setRevealedOriginals({});
+    setAiResult(null);
+    setAiError(null);
+    setCountdown(0);
+    setShowAiPanel(false);
+  }, [clues]);
+
   // AI Flavor state
   const [showAiPanel, setShowAiPanel] = useState(false);
   const [customFlavor, setCustomFlavor] = useState('');

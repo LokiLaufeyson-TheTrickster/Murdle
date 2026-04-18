@@ -38,6 +38,7 @@ const AppInner: React.FC = () => {
   const [gameState, setGameState] = useState<'menu' | 'playing'>('menu');
   const [showTutorial, setShowTutorial] = useState(false);
   const [contextHtml, setContextHtml] = useState('');
+  const [isReviewMode, setIsReviewMode] = useState(false);
 
   useEffect(() => {
     const newPuzzle = generatePuzzle(seed, difficulty, size, theme);
@@ -56,6 +57,8 @@ const AppInner: React.FC = () => {
     });
     setPuzzle(newPuzzle);
     setUserState({});
+    setIsReviewMode(false);
+    setEndgameState('playing');
     setCharges(difficulty === 'Cadet' ? 5 : difficulty === 'Sergeant' ? 2 : 1);
   }, [seed, difficulty, size, theme]);
 
@@ -192,6 +195,7 @@ const AppInner: React.FC = () => {
                 puzzle={puzzle}
                 userState={userState}
                 onCellClick={handleCellClick}
+                isReviewMode={isReviewMode}
               />
               
               <ClueList
@@ -283,9 +287,29 @@ const AppInner: React.FC = () => {
                   ? `Your deductive reasoning was flawless. The case is sealed. The guilty party won't see daylight for a long time.`
                   : `Your accusation was wrong. The true culprit is still out there — and now they know you're looking.`}
               </p>
-              <button className="btn-modern primary-btn" onClick={() => { setEndgameState('playing'); setSeed(Math.random().toString(36).substring(7).toUpperCase()); }}>
-                OPEN NEXT CASE FILE
-              </button>
+                <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '12px' }}>
+                  {endgameState === 'defeat' && (
+                    <button 
+                      className="btn-modern" 
+                      style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-bright)' }}
+                      onClick={() => {
+                        setIsReviewMode(true);
+                        setEndgameState('playing');
+                      }}
+                    >
+                      REVIEW CASE
+                    </button>
+                  )}
+                  <button 
+                    className="btn-modern primary-btn" 
+                    style={{ flex: 1 }}
+                    onClick={() => { 
+                      setSeed(Math.random().toString(36).substring(7).toUpperCase()); 
+                    }}
+                  >
+                    {endgameState === 'victory' ? 'NEXT CASE' : 'TRY NEW CASE'}
+                  </button>
+                </div>
             </div>
           </motion.div>
         )}

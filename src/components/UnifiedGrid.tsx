@@ -6,15 +6,29 @@ interface UnifiedGridProps {
   puzzle: Puzzle;
   userState: { [key: string]: { val: number, auto?: boolean } };
   onCellClick: (gridType: string, row: number, col: number) => void;
+  isReviewMode?: boolean;
 }
 
-export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onCellClick }) => {
-  const { size, suspects, weapons, locations } = puzzle;
+export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onCellClick, isReviewMode }) => {
+  const { size, suspects, weapons, locations, solution } = puzzle;
 
   const renderCell = (gridType: 'SW' | 'WL' | 'SL', localR: number, localC: number, globalR: number, globalC: number) => {
     const key = `${gridType}-${localR}-${localC}`;
     const cell = userState[key] || { val: 0 };
     const { val } = cell;
+
+    // Check for errors in review mode
+    let isError = false;
+    if (isReviewMode && val > 0 && val < 3) {
+      const isActuallyPair = gridType === 'SW' ? solution.sw[localR] === localC
+                           : gridType === 'WL' ? solution.wl[localR] === localC
+                           : solution.sl[localR] === localC;
+      
+      // Error if: marked Check but not pair, or marked X but IS pair
+      if ((val === 2 && !isActuallyPair) || (val === 1 && isActuallyPair)) {
+        isError = true;
+      }
+    }
 
     const isBottomEdge = globalR === size - 1;
     const isRightEdge = globalC === size - 1;
@@ -22,16 +36,17 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
     return (
       <div 
         key={key} 
-        className={`grid-cell ${val === 1 ? 'is-x' : val === 2 ? 'is-check' : val === 3 ? 'is-maybe' : ''}`}
+        className={`grid-cell ${val === 1 ? 'is-x' : val === 2 ? 'is-check' : val === 3 ? 'is-maybe' : ''} ${isError ? 'is-error' : ''}`}
         style={{
           borderRight: isRightEdge ? '3px solid var(--grid-line-bold)' : '1px solid var(--grid-line)',
           borderBottom: isBottomEdge ? '3px solid var(--grid-line-bold)' : '1px solid var(--grid-line)'
         }}
-        onClick={() => onCellClick(gridType, localR, localC)}
+        onClick={() => !isReviewMode && onCellClick(gridType, localR, localC)}
       >
         {val === 1 && <span className="cell-mark x">✕</span>}
         {val === 2 && <span className="cell-mark check">✓</span>}
         {val === 3 && <span className="cell-mark maybe">?</span>}
+        {isError && <div className="error-pulse" />}
       </div>
     );
   };
