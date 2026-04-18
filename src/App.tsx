@@ -201,6 +201,7 @@ const AppInner: React.FC = () => {
                 suspects={puzzle.suspects}
                 weapons={puzzle.weapons}
                 locations={puzzle.locations}
+                theme={puzzle.theme}
               />
             </main>
           </motion.div>

@@ -171,10 +171,10 @@ export const ClueList: React.FC<ClueListProps> = ({
             <div className="ai-panel-inner">
               <div className="ai-title mono">
                 <Sparkles size={14} color="var(--accent-primary)" />
-                AI NARRATIVE ENGINE ({theme.toUpperCase()})
+                AI NARRATIVE ENGINE ({(theme || 'Standard').toUpperCase()})
               </div>
               <p className="ai-desc">
-                The AI will rephrase clues in the <strong>{theme}</strong> style. Add a sub-tone if desired.
+                The AI will rephrase clues in the <strong>{theme || 'current'}</strong> style. Add a sub-tone if desired.
               </p>
               <div className="ai-input-row">
                 <input
