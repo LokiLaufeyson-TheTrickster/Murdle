@@ -28,7 +28,8 @@ export const WEAPON_ICONS: any = {
 
 export const LOCATION_ICONS: any = {
   Building2, Server, ParkingSquare, Leaf, Archive, Settings, Coffee: CoffeeL, Landmark,
-  Bath, Ladder, TreeDeciduous, Mountain, Castle, Ship, Tent, Library, ChefHat
+  Bath, Ladder, TreeDeciduous, Mountain, Castle, Ship, Tent, Library, ChefHat,
+  Star, Wind, Anchor, Moon
 };
 
 export const THEMES: Record<string, ThemeDef> = {
