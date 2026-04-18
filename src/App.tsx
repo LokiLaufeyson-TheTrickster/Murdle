@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // v4.1 Build
+import React, { useState, useEffect } from 'react'; // v5.0 Build
 import type { Difficulty, Puzzle } from './engine/types';
 import { generatePuzzle } from './engine/generator';
 import { getNarrative } from './engine/narrative';
@@ -11,9 +11,18 @@ import { AccuseModal } from './components/AccuseModal';
 import { SolutionWalkthrough } from './components/SolutionWalkthrough';
 import { StartMenu } from './components/StartMenu';
 import { TutorialModal } from './components/TutorialModal';
+import { SettingsProvider } from './context/SettingsContext';
 import { AnimatePresence, motion } from 'framer-motion';
 
-const App: React.FC = () => {
+const MURDER_INTRO_POOL = [
+  (w: string) => `A body has been found. The <strong>${w}</strong> is missing — and someone in this room knows where it went.`,
+  (l: string) => `A murder was committed inside the <strong>${l}</strong>. One person here did it. The rest are lying about something else entirely.`,
+  (w: string) => `The <strong>${w}</strong> was the instrument. The killer is still among us, waiting to see if you're as sharp as you think.`,
+  (l: string) => `Blood was found at the <strong>${l}</strong>. The timeline doesn't add up, and alibis are already crumbling.`,
+  (w: string) => `The <strong>${w}</strong> has vanished from the scene. So has the truth — but not for long.`,
+];
+
+const AppInner: React.FC = () => {
   const [seed, setSeed] = useState(() => Math.random().toString(36).substring(7).toUpperCase());
   const [difficulty, setDifficulty] = useState<Difficulty>('Sergeant');
   const [size, setSize] = useState(5);
@@ -28,15 +37,16 @@ const App: React.FC = () => {
   const [endgameState, setEndgameState] = useState<'playing' | 'victory' | 'defeat'>('playing');
   const [gameState, setGameState] = useState<'menu' | 'playing'>('menu');
   const [showTutorial, setShowTutorial] = useState(false);
+  const [contextHtml, setContextHtml] = useState('');
 
   useEffect(() => {
     const newPuzzle = generatePuzzle(seed, difficulty, size, theme);
     newPuzzle.clues = newPuzzle.clues.map(c => {
       const v = c.variables[0];
       let logicDisplay = '';
-      if (v.type === 'SW') logicDisplay = `${newPuzzle.suspects[v.i].name} ${c.isNegative ? '!= ' : '== '} ${newPuzzle.weapons[v.j].name}`;
-      if (v.type === 'WL') logicDisplay = `${newPuzzle.weapons[v.j].name} ${c.isNegative ? '!= ' : '== '} ${newPuzzle.locations[v.k].name}`;
-      if (v.type === 'SL') logicDisplay = `${newPuzzle.suspects[v.i].name} ${c.isNegative ? '!= ' : '== '} ${newPuzzle.locations[v.k].name}`;
+      if (v.type === 'SW') logicDisplay = `${newPuzzle.suspects[v.i].name} ${c.isNegative ? '≠ ' : '= '} ${newPuzzle.weapons[v.j].name}`;
+      if (v.type === 'WL') logicDisplay = `${newPuzzle.weapons[v.j].name} ${c.isNegative ? '≠ ' : '= '} ${newPuzzle.locations[v.k].name}`;
+      if (v.type === 'SL') logicDisplay = `${newPuzzle.suspects[v.i].name} ${c.isNegative ? '≠ ' : '= '} ${newPuzzle.locations[v.k].name}`;
 
       return {
         ...c,
@@ -48,6 +58,18 @@ const App: React.FC = () => {
     setUserState({});
     setCharges(difficulty === 'Cadet' ? 5 : difficulty === 'Sergeant' ? 2 : 1);
   }, [seed, difficulty, size, theme]);
+
+  useEffect(() => {
+    if (puzzle) {
+      const killerIdx = puzzle.seed.charCodeAt(0) % puzzle.size;
+      const wName = puzzle.weapons[puzzle.solution.sw[killerIdx]].name;
+      const lName = puzzle.locations[puzzle.solution.sl[killerIdx]].name;
+      const poolIdx = Math.floor((puzzle.seed.charCodeAt(1) || 0) % MURDER_INTRO_POOL.length);
+      const useWeapon = puzzle.solution.sw[0] % 2 === 0;
+      const html = MURDER_INTRO_POOL[poolIdx](useWeapon ? wName : lName);
+      setContextHtml(html);
+    }
+  }, [puzzle]);
 
   const handleCellClick = (gridType: string, row: number, col: number) => {
     const key = `${gridType}-${row}-${col}`;
@@ -99,25 +121,6 @@ const App: React.FC = () => {
     setUserState(newState);
   };
 
-  useEffect(() => {
-    if (puzzle) {
-      const killerIdx = puzzle.seed.charCodeAt(0) % puzzle.size;
-      const initialHtml = (() => {
-        const wName = puzzle.weapons[puzzle.solution.sw[killerIdx]].name;
-        const lName = puzzle.locations[puzzle.solution.sl[killerIdx]].name;
-        const showWeapon = puzzle.solution.sw[0] % 2 === 0;
-        if (showWeapon) {
-          return `A highly classified incident occurred involving the <strong>${wName}</strong>. Identify the culprit, secure the primary scene of the crime, and piece together everyone else's whereabouts!`;
-        } else {
-          return `A highly classified incident occurred at the <strong>${lName}</strong>. Identify the culprit, locate the missing weapon, and piece together everyone else's whereabouts!`;
-        }
-      })();
-      setContextHtml(initialHtml);
-    }
-  }, [puzzle]);
-
-  const [contextHtml, setContextHtml] = useState('');
-
   const useContradiction = () => {
     if (charges <= 0) return;
     setCharges(prev => prev - 1);
@@ -137,12 +140,11 @@ const App: React.FC = () => {
       });
     }
 
-    setErrorHighlight(foundError ? "HYPOTHESIS CONTRADICTED" : "NO IMMEDIATE CONTRADICTION");
+    setErrorHighlight(foundError ? "HYPOTHESIS CONTRADICTED" : "LOGIC HOLDS — CONTINUE");
     setTimeout(() => setErrorHighlight(null), 2500);
   };
 
-  // Show loading mostly for initial data prep
-  if (!puzzle && gameState === 'playing') return <div className="loading mono">DEDUCTION ENGINE BOOTING...</div>;
+  if (!puzzle && gameState === 'playing') return <div className="loading mono">INITIALIZING CASE FILE...</div>;
 
   return (
     <div className={`game-container theme-${theme}`}>
@@ -156,28 +158,28 @@ const App: React.FC = () => {
 
       <AnimatePresence mode="wait">
         {gameState === 'menu' ? (
-          <StartMenu 
+          <StartMenu
             key="menu"
-            onStart={() => setGameState('playing')} 
-            onOpenTutorial={() => setShowTutorial(true)} 
+            onStart={() => setGameState('playing')}
+            onOpenTutorial={() => setShowTutorial(true)}
           />
         ) : puzzle ? (
-          <motion.div 
+          <motion.div
             key="game"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="game-inner-wrapper"
           >
-            <TopBar 
-              seed={seed} 
-              difficulty={difficulty} 
+            <TopBar
+              seed={seed}
+              difficulty={difficulty}
               setDifficulty={setDifficulty}
               size={size}
               setSize={setSize}
               theme={theme}
               setTheme={setTheme}
-              charges={charges} 
+              charges={charges}
               onNewGame={() => { setSeed(Math.random().toString(36).substring(7).toUpperCase()); setEndgameState('playing'); }}
               onUseContradiction={useContradiction}
               onOpenDatabase={() => setShowEvidenceBoard(true)}
@@ -186,34 +188,37 @@ const App: React.FC = () => {
             />
             
             <main className="game-main">
-              <UnifiedGrid 
+              <UnifiedGrid
                 puzzle={puzzle}
                 userState={userState}
                 onCellClick={handleCellClick}
               />
               
-              <ClueList 
-                clues={puzzle.clues} 
+              <ClueList
+                clues={puzzle.clues}
                 contextHtml={contextHtml}
                 onShowWalkthrough={() => setShowWalkthrough(true)}
+                suspects={puzzle.suspects}
+                weapons={puzzle.weapons}
+                locations={puzzle.locations}
               />
             </main>
           </motion.div>
         ) : (
-          <div className="loading mono">INITIALIZING ENGINE...</div>
+          <div className="loading mono">LOADING CASE FILE...</div>
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {errorHighlight && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.1 }}
-            className={`alert-toast ${errorHighlight.includes('NO') ? 'success' : 'error'}`}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 1.05, y: -10 }}
+            className={`alert-toast ${errorHighlight.includes('CONTRADICTED') ? 'error' : 'success'}`}
           >
             <div className="toast-content">
-              <span className="toast-icon">{errorHighlight.includes('NO') ? '✓' : '⚠'}</span>
+              <span className="toast-icon">{errorHighlight.includes('CONTRADICTED') ? '⚠' : '✓'}</span>
               {errorHighlight}
             </div>
           </motion.div>
@@ -222,11 +227,11 @@ const App: React.FC = () => {
 
       <AnimatePresence>
         {showEvidenceBoard && puzzle && (
-          <EvidenceBoard 
-            suspects={puzzle.suspects} 
-            weapons={puzzle.weapons} 
-            locations={puzzle.locations} 
-            onClose={() => setShowEvidenceBoard(false)} 
+          <EvidenceBoard
+            suspects={puzzle.suspects}
+            weapons={puzzle.weapons}
+            locations={puzzle.locations}
+            onClose={() => setShowEvidenceBoard(false)}
           />
         )}
       </AnimatePresence>
@@ -246,9 +251,9 @@ const App: React.FC = () => {
 
       <AnimatePresence>
         {showAccuseWindow && puzzle && (
-          <AccuseModal 
-            suspects={puzzle.suspects} 
-            weapons={puzzle.weapons} 
+          <AccuseModal
+            suspects={puzzle.suspects}
+            weapons={puzzle.weapons}
             locations={puzzle.locations}
             trueMurderer={puzzle.suspects[puzzle.seed.charCodeAt(0) % puzzle.size].name}
             murderWeapon={puzzle.weapons[puzzle.solution.sw[puzzle.seed.charCodeAt(0) % puzzle.size]].name}
@@ -262,7 +267,7 @@ const App: React.FC = () => {
 
       <AnimatePresence>
         {endgameState !== 'playing' && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="endgame-overlay"
@@ -270,15 +275,15 @@ const App: React.FC = () => {
           >
             <div className="endgame-modal glass-card" style={{ borderColor: endgameState === 'victory' ? 'var(--accent-primary)' : 'var(--error)' }}>
               <h1 className="mono" style={{ color: endgameState === 'victory' ? 'var(--accent-primary)' : 'var(--error)' }}>
-                {endgameState === 'victory' ? 'CASE CLOSED' : 'FALSE ACCUSATION'}
+                {endgameState === 'victory' ? 'CASE CLOSED' : 'WRONG ACCUSATION'}
               </h1>
-              <p className="mono">
-                {endgameState === 'victory' 
-                  ? 'Your deductive reasoning is flawless. The culprit has been secured.' 
-                  : 'Your logic was flawed. The true culprit remains at large, and your reputation is on the line.'}
+              <p className="mono" style={{ fontSize: '0.9rem', lineHeight: 1.6, color: 'var(--text-dim)' }}>
+                {endgameState === 'victory'
+                  ? `Your deductive reasoning was flawless. The case is sealed. The guilty party won't see daylight for a long time.`
+                  : `Your accusation was wrong. The true culprit is still out there — and now they know you're looking.`}
               </p>
-              <button className="btn-modern" onClick={() => { setEndgameState('playing'); setSeed(Math.random().toString(36).substring(7).toUpperCase()); }}>
-                NEXT ASSIGNMENT
+              <button className="btn-modern primary-btn" onClick={() => { setEndgameState('playing'); setSeed(Math.random().toString(36).substring(7).toUpperCase()); }}>
+                OPEN NEXT CASE FILE
               </button>
             </div>
           </motion.div>
@@ -288,20 +293,39 @@ const App: React.FC = () => {
       <style dangerouslySetInnerHTML={{ __html: `
         .endgame-overlay {
           position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0,0,0,0.9);
+          background: rgba(0,0,0,0.92);
           z-index: 3000;
           display: flex; align-items: center; justify-content: center;
+          padding: 20px;
         }
         .endgame-modal {
-          max-width: 500px; text-align: center; display: flex; flex-direction: column; gap: 24px; padding: 40px; border-radius: 8px;
+          max-width: 480px; width: 100%;
+          text-align: center;
+          display: flex; flex-direction: column; gap: 24px; padding: 48px 32px;
+          border-radius: 12px;
         }
-        .endgame-modal h1 { font-size: 2.5rem; letter-spacing: 4px; }
+        .endgame-modal h1 { font-size: 2rem; letter-spacing: 4px; }
+        .primary-btn {
+          background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+          border: none;
+          color: white;
+          padding: 14px 28px;
+          border-radius: 8px;
+          font-weight: 800;
+          font-size: 0.85rem;
+          letter-spacing: 1px;
+          cursor: pointer;
+          font-family: 'Outfit', sans-serif;
+          transition: all 0.2s;
+        }
+        .primary-btn:hover { transform: scale(1.04); }
         
         .game-inner-wrapper {
           display: flex;
           flex-direction: column;
           height: 100vh;
           width: 100vw;
+          overflow: hidden;
         }
 
         .game-container {
@@ -311,48 +335,52 @@ const App: React.FC = () => {
           width: 100vw;
           position: relative;
           z-index: 10;
+          overflow: hidden;
         }
+
         .game-main {
           display: grid;
-          grid-template-columns: 1fr 420px;
+          grid-template-columns: 1fr 390px;
           gap: 0;
           flex: 1;
           overflow: hidden;
+          min-height: 0;
         }
+
         .loading {
           height: 100vh;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 2rem;
+          font-size: 1.5rem;
           color: var(--accent-primary);
           text-shadow: 0 0 20px var(--accent-glow);
-        }
-        .alert-toast {
-          position: fixed;
-          bottom: 40px;
-          left: 50%;
-          transform: translateX(-50%);
-          padding: 16px 32px;
-          border-radius: 12px;
-          backdrop-filter: blur(20px);
-          font-weight: 800;
-          letter-spacing: 1px;
-          z-index: 1000;
-          border: 1px solid rgba(255,255,255,0.2);
-          box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        }
-        .alert-toast.error { background: rgba(255, 45, 85, 0.9); color: white; }
-        .alert-toast.success { background: rgba(0, 255, 163, 0.9); color: #03040a; }
-        .toast-content { display: flex; align-items: center; gap: 12px; }
-        .toast-icon { font-size: 1.5rem; }
-        
-        @media (max-width: 1200px) {
-          .game-main { grid-template-columns: 1fr; }
-          .game-main .unified-grid-container { height: 60vh; }
+          letter-spacing: 3px;
         }
 
-        /* Dynamic Theme Overrides */
+        .alert-toast {
+          position: fixed;
+          bottom: 32px;
+          left: 50%;
+          transform: translateX(-50%);
+          padding: 14px 28px;
+          border-radius: 10px;
+          backdrop-filter: blur(20px);
+          font-family: 'JetBrains Mono', monospace;
+          font-weight: 800;
+          font-size: 0.75rem;
+          letter-spacing: 1px;
+          z-index: 4000;
+          border: 1px solid rgba(255,255,255,0.15);
+          box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+          white-space: nowrap;
+        }
+        .alert-toast.error { background: rgba(255,45,85,0.92); color: white; }
+        .alert-toast.success { background: rgba(0,255,163,0.92); color: #03040a; }
+        .toast-content { display: flex; align-items: center; gap: 10px; }
+        .toast-icon { font-size: 1.2rem; }
+
+        /* Theme Overrides */
         .theme-Modern {
           --bg-color: #03040a;
           --accent-primary: #00d2ff;
@@ -362,67 +390,73 @@ const App: React.FC = () => {
           --surface-1: rgba(10, 12, 20, 0.6);
           --surface-2: rgba(25, 28, 45, 0.8);
         }
-
         .theme-Noir {
           --bg-color: #0d0d0d;
           --accent-primary: #e6e6e6;
           --accent-secondary: #ff3333;
-          --accent-glow: rgba(255, 255, 255, 0.1);
-          --accent-purple-glow: rgba(255, 51, 51, 0.15);
-          --surface-1: rgba(30,30,30, 0.7);
-          --surface-2: rgba(45,45,45, 0.9);
+          --accent-glow: rgba(255,255,255,0.1);
+          --accent-purple-glow: rgba(255,51,51,0.15);
+          --surface-1: rgba(30,30,30,0.7);
+          --surface-2: rgba(45,45,45,0.9);
           --text-main: #d1d1d1;
           --border-bright: rgba(255,255,255,0.1);
         }
-
         .theme-Fantasy {
           --bg-color: #1a0b2e;
           --accent-primary: #f9d423;
           --accent-secondary: #21e6c1;
-          --accent-glow: rgba(249, 212, 35, 0.2);
-          --accent-purple-glow: rgba(33, 230, 193, 0.2);
-          --surface-1: rgba(45, 20, 80, 0.6);
-          --surface-2: rgba(60, 30, 100, 0.8);
+          --accent-glow: rgba(249,212,35,0.2);
+          --accent-purple-glow: rgba(33,230,193,0.2);
+          --surface-1: rgba(45,20,80,0.6);
+          --surface-2: rgba(60,30,100,0.8);
           --text-main: #e8dff5;
         }
 
         .game-container::before {
           content: '';
-          position: fixed;
-          top: 0; left: 0; right: 0; bottom: 0;
-          pointer-events: none;
-          z-index: -1;
+          position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+          pointer-events: none; z-index: -1;
           background: 
             radial-gradient(circle at 10% 10%, var(--accent-glow) 0%, transparent 40%),
             radial-gradient(circle at 90% 90%, var(--accent-purple-glow) 0%, transparent 40%);
-          opacity: 0.6;
+          opacity: 0.5;
           transition: all 1s ease;
-        }
-
-        .game-main {
-          background: radial-gradient(circle at center, rgba(255,255,255,0.02) 0%, transparent 70%);
-          position: relative;
         }
         .game-main::after {
           content: '';
-          position: absolute;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+          position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+          background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.06) 50%),
+            linear-gradient(90deg, rgba(255,0,0,0.02), rgba(0,255,0,0.01), rgba(0,0,255,0.02));
           background-size: 100% 2px, 3px 100%;
-          pointer-events: none;
-          z-index: 5;
-          opacity: 0.3;
+          pointer-events: none; z-index: 5; opacity: 0.25;
         }
 
-        .handwritten {
-          font-family: 'JetBrains Mono', monospace;
-          text-transform: uppercase;
-          font-weight: 400;
-          letter-spacing: 1px;
+        /* Mobile responsive */
+        @media (max-width: 900px) {
+          .game-main {
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr 40vh;
+          }
+        }
+        @media (max-width: 600px) {
+          .game-main {
+            grid-template-rows: 1fr 45vh;
+          }
+        }
+
+        .glass-accent {
+          background: rgba(0, 210, 255, 0.03);
+          border: 1px solid rgba(0, 210, 255, 0.1);
         }
       `}} />
     </div>
   );
 };
+
+const App: React.FC = () => (
+  <SettingsProvider>
+    <AppInner />
+  </SettingsProvider>
+);
 
 export default App;

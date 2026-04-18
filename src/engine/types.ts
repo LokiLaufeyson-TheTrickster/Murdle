@@ -30,24 +30,38 @@ export type Clue = {
   logicDisplay?: string;
 };
 
-
-
-export interface EntityDetails {
-  backstory?: string;
-  height?: string;
-  profession?: string;
-  trait?: string;
-  type?: string;     // Heaviness, light, etc
-  material?: string; // What it's made of (wax, steel, etc)
-  setting?: string;  // Indoor/Outdoor
-  feature?: string;  // Notable feature
+// ── Suspect attributes ────────────────────────────────────────────
+export interface SuspectDetails {
+  backstory: string;
+  height: string;           // e.g. "5ft 9in"
+  sunSign: string;          // e.g. "Scorpio"
+  eyeColor: string;         // e.g. "hazel"
+  hairColor: string;        // e.g. "auburn"
+  handedness: 'left-handed' | 'right-handed';
 }
+
+// ── Weapon attributes ─────────────────────────────────────────────
+export interface WeaponDetails {
+  description: string;      // Flavour text about the weapon
+  weight: 'heavy' | 'medium' | 'light';
+  madeOf: string;           // e.g. "stainless steel"
+  locationClue: string;     // What trace evidence is left at the scene
+}
+
+// ── Location attributes ────────────────────────────────────────────
+export interface LocationDetails {
+  setting: 'indoor' | 'outdoor' | 'underground';
+  descriptor: string;       // Short atmospheric note
+  traceFeature: string;     // Unique environmental feature used in clues (e.g. "vines")
+}
+
+export type EntityDetails = SuspectDetails | WeaponDetails | LocationDetails;
 
 export type AssetInfo = {
   name: string;
   icon: string;
   color?: string;
-  details: EntityDetails;
+  details: SuspectDetails | WeaponDetails | LocationDetails;
 };
 
 export type NarrativeTemplate = {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { SUSPECT_ICONS } from '../engine/narrative';
+import { SUSPECT_ICONS, WEAPON_ICONS, LOCATION_ICONS } from '../engine/narrative';
 import type { Puzzle } from '../engine/types';
 
 interface UnifiedGridProps {
@@ -16,7 +16,6 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
     const cell = userState[key] || { val: 0 };
     const { val } = cell;
 
-    // Determine border styles for separators using global axes
     const isBottomEdge = globalR === size - 1;
     const isRightEdge = globalC === size - 1;
 
@@ -37,30 +36,37 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
     );
   };
 
-  const renderIcon = (item: any, isSuspect = false) => {
-    if (isSuspect) {
-      const IconComp = SUSPECT_ICONS[item.icon] || SUSPECT_ICONS['User'];
-      return <IconComp size={24} style={{ color: item.color }} />;
-    }
-    return <span style={{ fontSize: '1.4rem' }}>{item.icon}</span>;
+  const renderSuspectIcon = (item: any, size: number = 22) => {
+    const IconComp = SUSPECT_ICONS[item.icon] || SUSPECT_ICONS['User'];
+    return <IconComp size={size} style={{ color: item.color || 'var(--accent-primary)' }} />;
+  };
+
+  const renderWeaponIcon = (item: any, sz: number = 20) => {
+    const IconComp = WEAPON_ICONS[item.icon] || WEAPON_ICONS['Knife'];
+    return <IconComp size={sz} style={{ color: item.color || '#cc8866' }} />;
+  };
+
+  const renderLocationIcon = (item: any, sz: number = 20) => {
+    const IconComp = LOCATION_ICONS[item.icon] || LOCATION_ICONS['Building2'];
+    return <IconComp size={sz} style={{ color: item.color || '#5577aa' }} />;
   };
 
   return (
     <div className="unified-grid-container glass-card">
       <div className="scroll-wrapper">
         <div className="grid-master-layout" style={{ 
-          gridTemplateColumns: `160px repeat(${size * 2}, 52px)`,
-          gridTemplateRows: `160px repeat(${size * 2}, 52px)`
+          gridTemplateColumns: `var(--header-w) repeat(${size * 2}, var(--cell-sz))`,
+          gridTemplateRows: `var(--header-h) repeat(${size * 2}, var(--cell-sz))`
         }}>
           {/* Top-Left Corner */}
-          <div className="corner-label glass" style={{ borderRight: '3px solid var(--grid-line-bold)', borderBottom: '3px solid var(--grid-line-bold)' }}></div>
+          <div className="corner-label glass" style={{ borderRight: '3px solid var(--grid-line-bold)', borderBottom: '3px solid var(--grid-line-bold)' }} />
 
           {/* Top Headers: Suspects */}
           {suspects.map((s, i) => (
             <div key={`th-s-${i}`} className="header-cell top" style={{ borderRight: i === size - 1 ? '3px solid var(--grid-line-bold)' : '1px solid var(--grid-line)', borderBottom: '3px solid var(--grid-line-bold)' }}>
               <div className="header-content top">
                 <span className="handwritten label top-label">{s.name}</span>
-                <div style={{ transform: i % 2 === 0 ? 'rotate(5deg)' : 'rotate(-5deg)' }}>{renderIcon(s, true)}</div>
+                <div style={{ transform: i % 2 === 0 ? 'rotate(5deg)' : 'rotate(-5deg)' }}>{renderSuspectIcon(s)}</div>
               </div>
             </div>
           ))}
@@ -70,7 +76,7 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
             <div key={`th-l-${i}`} className="header-cell top" style={{ borderRight: i === size - 1 ? '3px solid var(--grid-line-bold)' : '1px solid var(--grid-line)', borderBottom: '3px solid var(--grid-line-bold)' }}>
               <div className="header-content top">
                 <span className="handwritten label top-label">{l.name}</span>
-                <div style={{ transform: i % 2 === 0 ? 'rotate(-3deg)' : 'rotate(3deg)' }}>{renderIcon(l)}</div>
+                <div style={{ transform: i % 2 === 0 ? 'rotate(-3deg)' : 'rotate(3deg)' }}>{renderLocationIcon(l)}</div>
               </div>
             </div>
           ))}
@@ -82,7 +88,9 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
               <div className="header-cell side" style={{ borderBottom: r === size - 1 ? '3px solid var(--grid-line-bold)' : '1px solid var(--grid-line)', borderRight: '3px solid var(--grid-line-bold)' }}>
                 <div className="header-content side">
                   <span className="handwritten label">{r < size ? weapons[r].name : locations[r - size].name}</span>
-                  <div style={{ transform: r % 2 === 0 ? 'rotate(4deg)' : 'rotate(-4deg)' }}>{r < size ? renderIcon(weapons[r]) : renderIcon(locations[r - size])}</div>
+                  <div style={{ transform: r % 2 === 0 ? 'rotate(4deg)' : 'rotate(-4deg)', flexShrink: 0 }}>
+                    {r < size ? renderWeaponIcon(weapons[r]) : renderLocationIcon(locations[r - size])}
+                  </div>
                 </div>
               </div>
 
@@ -95,7 +103,7 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
                 return <div key={`empty-${r}-${c}`} className="grid-empty" style={{
                   borderLeft: c === size ? '3px solid var(--grid-line-bold)' : 'none',
                   borderTop: r === size ? '3px solid var(--grid-line-bold)' : 'none'
-                }}></div>;
+                }} />;
               })}
             </React.Fragment>
           ))}
@@ -103,6 +111,25 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
+        :root {
+          --header-w: 150px;
+          --header-h: 150px;
+          --cell-sz: 48px;
+        }
+        @media (max-width: 900px) {
+          :root {
+            --header-w: 110px;
+            --header-h: 110px;
+            --cell-sz: 40px;
+          }
+        }
+        @media (max-width: 600px) {
+          :root {
+            --header-w: 90px;
+            --header-h: 90px;
+            --cell-sz: 34px;
+          }
+        }
         .unified-grid-container {
           margin: 0;
           overflow: hidden;
@@ -118,6 +145,11 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
         .scroll-wrapper {
           overflow: auto;
           flex: 1;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 32px 16px 16px;
         }
         .grid-master-layout {
           display: grid;
@@ -128,17 +160,16 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
           margin: auto;
           position: relative;
         }
-        /* Forensic corner marker */
         .grid-master-layout::before {
-          content: 'CASE EVIDENCE #EF-402';
+          content: 'CASE FILE — RESTRICTED';
           position: absolute;
-          top: -30px;
+          top: -26px;
           left: 0;
           font-family: 'JetBrains Mono', monospace;
-          font-size: 0.7rem;
+          font-size: 0.6rem;
           color: var(--accent-primary);
-          opacity: 0.6;
-          letter-spacing: 2px;
+          opacity: 0.5;
+          letter-spacing: 3px;
         }
         .header-cell {
           background: rgba(255,255,255,0.03);
@@ -148,50 +179,56 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
           position: relative;
         }
         .header-cell.top {
-          height: 160px;
-          background: rgba(255,255,255,0.05);
+          height: var(--header-h);
+          background: rgba(255,255,255,0.04);
         }
         .header-cell.side {
-          width: 160px;
+          width: var(--header-w);
           justify-content: flex-end;
-          padding-right: 12px;
-          background: rgba(255,255,255,0.05);
+          padding-right: 10px;
+          background: rgba(255,255,255,0.04);
         }
         .header-content.top {
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: flex-end;
-          padding-bottom: 8px;
+          padding-bottom: 6px;
           height: 100%;
           width: 100%;
         }
         .header-cell .label.top-label {
           writing-mode: vertical-rl;
           transform: rotate(180deg);
-          margin-bottom: 8px;
-          max-height: 90px;
+          margin-bottom: 6px;
+          max-height: 80px;
         }
         .header-content.side {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 8px;
           text-align: right;
+          width: 100%;
+          padding-right: 8px;
+          justify-content: flex-end;
         }
         .header-cell .label {
-          font-size: 0.9rem;
+          font-size: 0.75rem;
           color: var(--text-main);
-          max-width: 130px;
+          max-width: 120px;
           overflow: hidden;
           text-overflow: ellipsis;
           font-weight: 400;
           text-transform: uppercase;
-          letter-spacing: 1px;
+          letter-spacing: 0.5px;
+        }
+        @media (max-width: 600px) {
+          .header-cell .label { font-size: 0.6rem; max-width: 75px; }
         }
         
         .grid-cell {
-          width: 52px;
-          height: 52px;
+          width: var(--cell-sz);
+          height: var(--cell-sz);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -200,26 +237,19 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
           transition: all 0.1s;
         }
         .grid-cell:hover {
-          background: rgba(255,255,255,0.1);
-          box-shadow: inset 0 0 10px var(--accent-glow);
+          background: rgba(255,255,255,0.08);
+          box-shadow: inset 0 0 8px var(--accent-glow);
         }
-        .grid-empty {
-          background: transparent;
-        }
+        .grid-empty { background: transparent; }
         
-        .cell-mark {
-          font-size: 1.4rem;
-          font-weight: 800;
-        }
+        .cell-mark { font-size: 1.2rem; font-weight: 800; }
+        @media (max-width: 600px) { .cell-mark { font-size: 1rem; } }
         .cell-mark.x { color: var(--error); opacity: 0.8; }
-        .cell-mark.check { 
-          color: var(--success); 
-          text-shadow: 0 0 12px var(--success); 
-        }
+        .cell-mark.check { color: var(--success); text-shadow: 0 0 10px var(--success); }
         .cell-mark.maybe { color: var(--accent-primary); }
         
-        .is-check { background: rgba(0, 255, 163, 0.08) !important; }
-        .is-x { background: rgba(255, 45, 85, 0.04) !important; }
+        .is-check { background: rgba(0, 255, 163, 0.07) !important; }
+        .is-x { background: rgba(255, 45, 85, 0.03) !important; }
       `}} />
     </div>
   );

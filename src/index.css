@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap');
 
 :root {
   --bg-color: #03040a;
@@ -15,8 +15,8 @@
   --border-bright: rgba(255, 255, 255, 0.15);
   --error: #ff2d55;
   --success: #00ffa3;
-  --grid-line: rgba(255, 255, 255, 0.08);
-  --grid-line-bold: rgba(255, 255, 255, 0.25);
+  --grid-line: rgba(255, 255, 255, 0.07);
+  --grid-line-bold: rgba(255, 255, 255, 0.22);
   --blur: 20px;
 }
 
@@ -24,6 +24,12 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -35,7 +41,7 @@ body {
     radial-gradient(circle at 80% 80%, var(--accent-purple-glow) 0%, transparent 40%);
   background-attachment: fixed;
   min-height: 100vh;
-  overflow: hidden;
+  touch-action: manipulation;
 }
 
 .mono {
@@ -48,6 +54,7 @@ body {
   height: 100vh;
   position: relative;
   z-index: 10;
+  overflow: hidden;
 }
 
 /* Glassmorphism */
@@ -78,7 +85,7 @@ body {
   animation: float 6s ease-in-out infinite;
 }
 
-/* Particle Background Setup */
+/* Particle Background */
 #particles-canvas {
   position: fixed;
   top: 0;
@@ -91,7 +98,8 @@ body {
 
 /* Webkit Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -102,4 +110,12 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-primary);
+}
+
+/* Utility: icon + text label pair in buttons */
+.btn-label {
+  display: inline;
+}
+@media (max-width: 600px) {
+  .btn-label { display: none; }
 }
