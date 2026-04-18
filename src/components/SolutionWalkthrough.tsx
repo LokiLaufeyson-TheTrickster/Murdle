@@ -17,6 +17,7 @@ interface SolutionWalkthroughProps {
   weapons: AssetInfo[];
   locations: AssetInfo[];
   solution: { sw: number[]; wl: number[]; sl: number[] };
+  murdererIdx: number;
   onClose: () => void;
 }
 
@@ -25,7 +26,8 @@ function buildSteps(
   suspects: AssetInfo[],
   weapons: AssetInfo[],
   locations: AssetInfo[],
-  solution: { sw: number[]; wl: number[]; sl: number[] }
+  solution: { sw: number[]; wl: number[]; sl: number[] },
+  murdererIdx: number
 ): SolutionStep[] {
   const steps: SolutionStep[] = [];
 
@@ -79,7 +81,6 @@ function buildSteps(
   });
 
   // Add final inference step
-  const murdererIdx = solution.sw.findIndex((wIdx, sIdx) => solution.wl[wIdx] === solution.sl[sIdx]);
   const murderer = suspects[murdererIdx]?.name ?? suspects[0]?.name;
   const murderWeapon = weapons[solution.sw[murdererIdx]]?.name ?? weapons[0]?.name;
   const murderLocation = locations[solution.sl[murdererIdx]]?.name ?? locations[0]?.name;
@@ -96,10 +97,10 @@ function buildSteps(
 }
 
 export const SolutionWalkthrough: React.FC<SolutionWalkthroughProps> = ({
-  clues, suspects, weapons, locations, solution, onClose
+  clues, suspects, weapons, locations, solution, murdererIdx, onClose
 }) => {
   const [expanded, setExpanded] = useState<number | null>(null);
-  const steps = buildSteps(clues, suspects, weapons, locations, solution);
+  const steps = buildSteps(clues, suspects, weapons, locations, solution, murdererIdx);
 
   return (
     <motion.div

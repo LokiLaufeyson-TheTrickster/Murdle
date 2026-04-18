@@ -64,12 +64,15 @@ const AppInner: React.FC = () => {
 
   useEffect(() => {
     if (puzzle) {
-      const killerIdx = puzzle.seed.charCodeAt(0) % puzzle.size;
-      const wName = puzzle.weapons[puzzle.solution.sw[killerIdx]].name;
-      const lName = puzzle.locations[puzzle.solution.sl[killerIdx]].name;
+      const { murdererIdx } = puzzle;
+      const wName = puzzle.weapons[puzzle.solution.sw[murdererIdx]].name;
+      const lName = puzzle.locations[puzzle.solution.sl[murdererIdx]].name;
+      
       const poolIdx = Math.floor((puzzle.seed.charCodeAt(1) || 0) % MURDER_INTRO_POOL.length);
-      const useWeapon = puzzle.solution.sw[0] % 2 === 0;
-      const html = MURDER_INTRO_POOL[poolIdx](useWeapon ? wName : lName);
+      // Even templates (0, 2, 4) expect a weapon; Odd templates (1, 3) expect a location
+      const isWeaponTemplate = poolIdx % 2 === 0;
+      const html = MURDER_INTRO_POOL[poolIdx](isWeaponTemplate ? wName : lName);
+      
       setContextHtml(html);
     }
   }, [puzzle]);
@@ -249,6 +252,7 @@ const AppInner: React.FC = () => {
             weapons={puzzle.weapons}
             locations={puzzle.locations}
             solution={puzzle.solution}
+            murdererIdx={puzzle.murdererIdx}
             onClose={() => setShowWalkthrough(false)}
           />
         )}
@@ -260,9 +264,9 @@ const AppInner: React.FC = () => {
             suspects={puzzle.suspects}
             weapons={puzzle.weapons}
             locations={puzzle.locations}
-            trueMurderer={puzzle.suspects[puzzle.seed.charCodeAt(0) % puzzle.size].name}
-            murderWeapon={puzzle.weapons[puzzle.solution.sw[puzzle.seed.charCodeAt(0) % puzzle.size]].name}
-            murderLocation={puzzle.locations[puzzle.solution.sl[puzzle.seed.charCodeAt(0) % puzzle.size]].name}
+            trueMurderer={puzzle.suspects[puzzle.murdererIdx].name}
+            murderWeapon={puzzle.weapons[puzzle.solution.sw[puzzle.murdererIdx]].name}
+            murderLocation={puzzle.locations[puzzle.solution.sl[puzzle.murdererIdx]].name}
             onClose={() => setShowAccuseWindow(false)}
             onVictory={() => { setShowAccuseWindow(false); setEndgameState('victory'); }}
             onDefeat={() => { setShowAccuseWindow(false); setEndgameState('defeat'); }}

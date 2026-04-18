@@ -76,12 +76,12 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
       return <IconComp size={size} style={{ color: item.color || 'var(--accent-primary)' }} />;
     }
     if (activeTab === 'weapons') {
-      const IconComp = WEAPON_ICONS[item.icon] || WEAPON_ICONS['Knife'];
-      return <IconComp size={size} style={{ color: item.color || '#cc8866' }} />;
+      const IconComp = WEAPON_ICONS[item.icon] || WEAPON_ICONS['Target'];
+      return <IconComp size={size} style={{ color: item.color || '#FFC107' }} />;
     }
     // Location
-    const IconComp = LOCATION_ICONS[item.icon] || LOCATION_ICONS['Building2'];
-    return <IconComp size={size} style={{ color: item.color || '#5577aa' }} />;
+    const IconComp = LOCATION_ICONS[item.icon] || LOCATION_ICONS['Wind'];
+    return <IconComp size={size} style={{ color: item.color || '#00E5FF' }} />;
   };
 
   const renderGridIcon = (item: AssetInfo) => renderIcon(item, 32);

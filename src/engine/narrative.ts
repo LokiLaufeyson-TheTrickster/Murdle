@@ -191,70 +191,70 @@ export const THEMES: Record<string, ThemeDef> = {
       {
         name: 'Corner Office', icon: 'Building2', color: '#334466',
         details: {
-          setting: 'indoor', descriptor: "A panoramic glass office on the 40th floor. Soundproofed doors, no cameras inside per executive request.",
+          setting: 'indoor', descriptor: "A panoramic glass office on the 40th floor. Soundproofed doors, no cameras inside. A fine layer of dust is disturbed on the mahogany desk surface.",
           traceFeature: "a fine layer of dust disturbed on the mahogany desk surface"
         }
       },
       {
         name: 'Server Room', icon: 'Server', color: '#112233',
         details: {
-          setting: 'indoor', descriptor: "Freezing cold and deafeningly loud. The hum of a thousand spinning drives masks any sound from within.",
+          setting: 'indoor', descriptor: "Freezing cold and deafeningly loud. The hum of spinning drives masks any sound. A scuff mark is visible on the raised floor tiles near the access terminal.",
           traceFeature: "a scuff mark on the raised floor tiles near the access terminal"
         }
       },
       {
         name: 'Underground Parking', icon: 'ParkingSquare', color: '#444444',
         details: {
-          setting: 'outdoor', descriptor: "Level B3. Flickering fluorescents, blind spots on every camera, oil slick floor.",
+          setting: 'outdoor', descriptor: "Level B3. Flickering fluorescents and oil-slicked concrete. A fresh tire-rubber smear marks where someone backed in quickly.",
           traceFeature: "a fresh tire-rubber smear on the concrete where someone backed in quickly"
         }
       },
       {
         name: 'Rooftop Garden', icon: 'Leaf', color: '#1a4a1a',
         details: {
-          setting: 'outdoor', descriptor: "Forty stories up, above the cameras. The only sound is wind and distant sirens. Planters line the edges.",
+          setting: 'outdoor', descriptor: "Forty stories up, above the cameras. The only sound is wind. Trampled soil and a torn leaf near the planter suggest someone crouched here.",
           traceFeature: "trampled soil and a torn leaf near the planter where someone crouched"
         }
       },
       {
         name: 'Archive Room', icon: 'Archive', color: '#554433',
         details: {
-          setting: 'indoor', descriptor: "A forgotten labyrinth of filing cabinets stretching back years. Nobody ever goes here. Perfect for that reason.",
+          setting: 'indoor', descriptor: "A forgotten labyrinth of filing cabinets. A displaced stack of folders and dusty footprints remain on the tile floor.",
           traceFeature: "a displaced stack of folders and dusty footprints on the tile floor"
         }
       },
       {
         name: 'Maintenance Shaft', icon: 'Settings', color: '#333333',
         details: {
-          setting: 'indoor', descriptor: "Claustrophobic, reeking of machine oil, accessible from a panel on every floor.",
+          setting: 'indoor', descriptor: "Claustrophobic and reeking of machine oil. Oil residue on the hatch frame and a smeared handprint on the metal ladder mark a forced entry.",
           traceFeature: "oil residue on the hatch frame and a smeared handprint on the metal ladder"
         }
       },
       {
         name: 'Espresso Bar', icon: 'Coffee', color: '#4a2c0a',
         details: {
-          setting: 'indoor', descriptor: "The office espresso bar, abandoned mid-afternoon. Steam still hisses from the machine.",
+          setting: 'indoor', descriptor: "The office espresso bar, abandoned mid-afternoon. A still-warm cup and a spilled coffee ring linger on the marble counter.",
           traceFeature: "a still-warm cup and a spilled coffee ring on the marble counter"
         }
       },
       {
         name: 'Corporate Lobby', icon: 'Landmark', color: '#223355',
         details: {
-          setting: 'indoor', descriptor: "Marble floors that echo every footstep. The receptionist left at 6. The cameras only cover the front doors.",
+          setting: 'indoor', descriptor: "Marble floors that echo every footstep. A scuff on the polished marble and a disturbed floral arrangement near the pillar are the only signs of struggle.",
           traceFeature: "a scuff on the polished marble and a disturbed floral arrangement near the pillar"
         }
       },
       {
         name: 'Executive Restroom', icon: 'Bath', color: '#112233',
         details: {
-          setting: 'indoor', descriptor: "Alabaster tiles. Shattered mirror. Someone cleaned up hastily -- but not carefully enough.",
+          setting: 'indoor', descriptor: "Alabaster tiles and shattered glass. Mirror fragments swept to one side and a damp towel dropped behind the door reveal a hasty cleanup.",
           traceFeature: "mirror fragments swept to one side and a damp towel dropped behind the door"
         }
       },
       {
         name: 'Fire Escape', icon: 'Ladder', color: '#5a3000',
         details: {
-          setting: 'outdoor', descriptor: "Rusted iron stairs slick with drizzle. The external door alarm was taped off two weeks ago for maintenance.",
+          setting: 'outdoor', descriptor: "Rusted iron stairs slick with drizzle. Orange rust flakes and a wet bootprint on the landing mark exactly where they passed through.",
           traceFeature: "orange rust flakes disturbed on the grating and a wet bootprint on the landing"
         }
       }
@@ -421,70 +421,70 @@ export const THEMES: Record<string, ThemeDef> = {
       {
         name: 'Throne Room', icon: 'Castle', color: '#332200',
         details: {
-          setting: 'indoor', descriptor: "Echoing marble halls flanked by standing armor. Permanently guarded -- except during the feast.",
+          setting: 'indoor', descriptor: "Echoing marble halls flanked by standing armor. A ceremonial standard is knocked from its mount near the dais.",
           traceFeature: "a displaced ceremonial standard knocked from its mount near the dais"
         }
       },
       {
         name: 'Wizard Tower', icon: 'Wind', color: '#110033',
         details: {
-          setting: 'indoor', descriptor: "Filled with floating orbs and unlabeled vials. Every surface hums with residual magic.",
+          setting: 'indoor', descriptor: "Filled with floating orbs and humming scrolls. A disturbed magical glyph on the floor no longer holds its original shape.",
           traceFeature: "a disturbed magical glyph on the floor that no longer holds its original shape"
         }
       },
       {
         name: 'Dark Dungeon', icon: 'Anchor', color: '#111111',
         details: {
-          setting: 'underground', descriptor: "Damp stone and distant screaming. The torches barely push back the dark.",
+          setting: 'underground', descriptor: "Damp stone and rusted iron. Chain links are disturbed and rusted dust is scattered from a forced movement along the floor.",
           traceFeature: "chain links disturbed and rusted dust scattered from a forced movement along the floor"
         }
       },
       {
         name: 'Enchanted Forest', icon: 'TreeDeciduous', color: '#0a3300',
         details: {
-          setting: 'outdoor', descriptor: "The trees rearrange themselves when unwatched. Navigation is impossible without a guiding charm.",
+          setting: 'outdoor', descriptor: "The trees rearrange themselves when unwatched. Broken vines and bark-sap ooze from a trunk damaged during a struggle.",
           traceFeature: "broken vines and bark-sap oozing from a tree damaged during someone forced passage"
         }
       },
       {
         name: 'Local Tavern', icon: 'Coffee', color: '#332200',
         details: {
-          setting: 'indoor', descriptor: "Crowded, smoky, smelling of stale ale and old arguments. The perfect place to disappear.",
+          setting: 'indoor', descriptor: "Smoky and loud. A spilled drink is still spreading across a table next to an overturned stool.",
           traceFeature: "a spilled drink still spreading and an overturned stool mark the exact table"
         }
       },
       {
         name: 'Blacksmith Forge', icon: 'Dumbbell', color: '#330000',
         details: {
-          setting: 'indoor', descriptor: "Blistering heat and flying sparks. The noise of hammering covers any sound within twenty feet.",
+          setting: 'indoor', descriptor: "Blistering heat and flying sparks. Fresh hammer marks on the cold metal floor show where something was struck and dragged.",
           traceFeature: "fresh hammer marks on the cold metal floor where something was struck and dragged"
         }
       },
       {
         name: 'Treasure Vault', icon: 'Star', color: '#553300',
         details: {
-          setting: 'indoor', descriptor: "Gold stacked to the ceiling, every inch catalogued -- but not tonight. Three traps tripped in sequence.",
+          setting: 'indoor', descriptor: "Gold stacked to the ceiling. A sprung floor tile and scattered coins mark the path to the forced vault door.",
           traceFeature: "a sprung floor tile and scattered gold coins across the path to the vault door"
         }
       },
       {
         name: 'Decrepit Graveyard', icon: 'Moon', color: '#112211',
         details: {
-          setting: 'outdoor', descriptor: "Mist clings ankle-high. The stones are old enough that nobody remembers whose names are carved.",
-          traceFeature: "freshly turned earth near the old yew tree and disturbed grave-moss on the path"
+          setting: 'outdoor', descriptor: "Mist clings ankle-high. Freshly turned earth near the old yew tree and disturbed grave-moss suggest a recent burial.",
+          traceFeature: "fresh freshly turned earth near the old yew tree and disturbed grave-moss on the path"
         }
       },
       {
         name: 'Magic Academy', icon: 'BookOpen', color: '#221133',
         details: {
-          setting: 'indoor', descriptor: "Illusory walls that test the worthy. Staircases rearranged themselves last Thursday and nobody fixed them.",
+          setting: 'indoor', descriptor: "Illusory walls and shifting stairs. A trail of shifting illusory sparks was left behind by an unauthorized spell.",
           traceFeature: "a trail of shifting illusory sparks left behind by an unauthorized spell being cast"
         }
       },
       {
         name: 'Dragon Cave', icon: 'Mountain', color: '#221100',
         details: {
-          setting: 'outdoor', descriptor: "Sulphurous fumes and claw-marks on every surface. Bones litter the entrance. The real dragon left decades ago.",
+          setting: 'outdoor', descriptor: "Sulphurous fumes and claw-marks. Sulfur residue and crushed bones at the entrance show where something was dragged in.",
           traceFeature: "sulfur residue and crushed bones at the cave entrance where something was dragged in"
         }
       }
@@ -651,70 +651,70 @@ export const THEMES: Record<string, ThemeDef> = {
       {
         name: 'The Ballroom', icon: 'Star', color: '#221100',
         details: {
-          setting: 'indoor', descriptor: "Crystal chandeliers flicker. The party ended an hour ago. Someone stayed.",
+          setting: 'indoor', descriptor: "Crystal chandeliers flicker. A champagne flute is shattered on the parquet with a heel-mark in the spilled liquid.",
           traceFeature: "a champagne flute shattered on the parquet and a heel-mark in the spilled liquid"
         }
       },
       {
         name: 'Library', icon: 'BookOpen', color: '#221100',
         details: {
-          setting: 'indoor', descriptor: "A secret bookcase door sits slightly ajar behind the encyclopedias. The reading lamp was left on.",
+          setting: 'indoor', descriptor: "A secret bookcase door sits slightly ajar. A disturbed bookshelf with a specific volume out of place conceals a note.",
           traceFeature: "a disturbed bookshelf with a specific volume out of place, concealing a pressed note"
         }
       },
       {
         name: 'Conservatory', icon: 'Leaf', color: '#112200',
         details: {
-          setting: 'indoor', descriptor: "Humid, glass-walled, filled with the heavy scent of orchids. The moisture makes footprints last.",
+          setting: 'indoor', descriptor: "Humid and transparent. Fresh soil is disturbed near an orchid planter and condensation is wiped from the glass.",
           traceFeature: "fresh soil disturbed near an orchid planter and condensation wiped from the glass pane"
         }
       },
       {
         name: 'Billiard Room', icon: 'Target', color: '#002200',
         details: {
-          setting: 'indoor', descriptor: "Scattered cue balls, a glass of Scotch spilled on the felt, and nobody to explain why.",
+          setting: 'indoor', descriptor: "Scattered cue balls and spilled Scotch. Whisky is pooled under the table edge and a billiard cue is left at an odd angle.",
           traceFeature: "Scotch whisky pooled under the table edge and a billiard cue left at an odd angle"
         }
       },
       {
         name: 'Dark Alley', icon: 'Anchor', color: '#111111',
         details: {
-          setting: 'outdoor', descriptor: "Rain-slicked cobblestones, bins spilling over, one broken gas lamp. Footsteps do not stay long here.",
+          setting: 'outdoor', descriptor: "Rain-slicked cobblestones. A wet footprint is preserved in a puddle near a bin before the rain washes it away.",
           traceFeature: "a wet footprint preserved in a puddle near the bin before the rain washes it away"
         }
       },
       {
         name: 'Mansion Roof', icon: 'Mountain', color: '#222222',
         details: {
-          setting: 'outdoor', descriptor: "Slippery slate tiles in the thunder. The access hatch was forced.",
+          setting: 'outdoor', descriptor: "Slippery slate tiles. A wet slide mark and a jemmied roof hatch latch mark an entry point.",
           traceFeature: "a wet slide mark on the tiles and a jemmied roof hatch latch still bent outward"
         }
       },
       {
         name: 'Wine Cellar', icon: 'Wine', color: '#330022',
         details: {
-          setting: 'underground', descriptor: "Pitch black, cobweb-laced, smelling of aged wood and dust. Nobody comes here unless they need to hide something.",
+          setting: 'underground', descriptor: "Pitch black and cobweb-laced. A disturbed wine rack and a broken wax seal on the floor reveal a search.",
           traceFeature: "a disturbed wine rack with bottles shifted and a broken wax bottle-seal on the floor"
         }
       },
       {
         name: 'Kitchen', icon: 'ChefHat', color: '#111111',
         details: {
-          setting: 'indoor', descriptor: "Cold stoves and a missing knife from the butcher block. The cook left at eight.",
+          setting: 'indoor', descriptor: "Cold stoves and a missing cleaver. Flour footprints on the kitchen tiles lead toward the pantry.",
           traceFeature: "a missing knife slot in the butcher block and flour footprints on the kitchen tiles"
         }
       },
       {
         name: 'Study', icon: 'Library', color: '#221100',
         details: {
-          setting: 'indoor', descriptor: "A cracked-open safe behind a tilted oil painting. Whatever was inside is gone now.",
+          setting: 'indoor', descriptor: "A tilted oil painting hides a safe. Fingerprints in the dust and a torn paper corner caught in the hinge tell of a theft.",
           traceFeature: "safe-dial fingerprints in dust and a torn paper corner caught in the safe door hinge"
         }
       },
       {
         name: 'Secret Passage', icon: 'Ladder', color: '#111111',
         details: {
-          setting: 'indoor', descriptor: "Narrow, dusty, smelling of old stone. Footprints in both directions -- nobody ever leaves the same way they came.",
+          setting: 'indoor', descriptor: "Narrow and dusty. Two sets of footprints lead in opposite directions -- one fresh, one partially obscured.",
           traceFeature: "two sets of footprints in the dust -- one fresh, one partially obscured -- lead in opposite directions"
         }
       }
@@ -829,8 +829,7 @@ export function getNarrative(clue: any, suspects: any[], weapons: any[], locatio
   const getS = () => {
     const obj = suspects[v.i];
     if (!obj) return '';
-    if (Math.random() < 0.4) return obj.name;
-    const d = obj.details;
+    if (Math.random() < 0.7) return obj.name;
     return getUniqueTrait(obj, suspects, [
       (o: any) => o.details.height ? `the individual standing exactly ${o.details.height}` : null,
       (o: any) => o.details.handedness ? `the ${o.details.handedness} suspect` : null,
@@ -838,13 +837,12 @@ export function getNarrative(clue: any, suspects: any[], weapons: any[], locatio
       (o: any) => o.details.hairColor ? `the person with ${o.details.hairColor} hair` : null,
       (o: any) => o.details.sunSign ? `the ${o.details.sunSign}` : null,
     ]);
-    void d;
   };
 
   const getW = () => {
     const obj = weapons[v.j];
     if (!obj) return '';
-    if (Math.random() < 0.4) return obj.name;
+    if (Math.random() < 0.7) return obj.name;
     return getUniqueTrait(obj, weapons, [
       (o: any) => o.details.madeOf ? `the weapon crafted from ${o.details.madeOf}` : null,
       (o: any) => o.details.weight ? `the ${o.details.weight}-weight instrument` : null,
@@ -854,7 +852,8 @@ export function getNarrative(clue: any, suspects: any[], weapons: any[], locatio
   const getL = () => {
     const obj = locations[v.k];
     if (!obj) return '';
-    if (Math.random() < 0.4) return obj.name;
+    // High probability of using the actual name for clarity
+    if (Math.random() < 0.7) return obj.name;
     return getUniqueTrait(obj, locations, [
       (o: any) => o.details.setting ? `the ${o.details.setting} location` : null,
       (o: any) => o.details.traceFeature ? `the place where ${o.details.traceFeature}` : null,

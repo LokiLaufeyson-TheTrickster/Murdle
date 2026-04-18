@@ -21,17 +21,18 @@ async function callGeminiAPI(
   themeName: string
 ): Promise<string> {
   const clueTexts = clues.map((c, i) => `Clue ${i + 1}: ${c.text}`).join('\n');
-  const systemInstruction = `You are a world-class narrator specializing in ${themeName} detective fiction. 
-You will receive a list of investigation clues. 
-Your task: rewrite these clues as atmospheric narrative entries.
+  const systemInstruction = `You are a world-class narrator specializing in detective fiction. 
+Your goal is to rewrite investigation clues as atmospheric narrative entries.
+
+STYLE GUIDELINE:
+${customPrompt 
+  ? `CRITICAL STYLE OVERWRITE: You must narrate exclusively in the style of: "${customPrompt}". Ignore the default "${themeName}" setting for your prose and vocabulary.`
+  : `The current case setting is: "${themeName}". Use vocabulary and tone appropriate for this era/genre.`
+}
 
 CRITICAL REQUIREMENTS:
 1. FACTUAL INTEGRITY: You MUST NOT change the meaning. Every name, weapon, location, and logical relationship (e.g., "was not at", "was with", "was left-handed") MUST be preserved perfectly.
-2. THEME ADHERENCE: Use vocabulary and tone appropriate for the "${themeName}" setting.
-${customPrompt ? `3. ADDITIONAL STYLE: Follow this direction: "${customPrompt}"` : ''}
-
-FORMAT:
-Return ONLY the flavored clues, each separated by a blank line, prefixed with its clue number like "CLUE 1:" etc.`;
+2. FORMAT: Return ONLY the flavored clues, each separated by a blank line, prefixed with its clue number like "CLUE 1:" etc.`;
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`,
@@ -184,14 +185,14 @@ export const ClueList: React.FC<ClueListProps> = ({
                 AI NARRATIVE ENGINE ({(theme || 'Standard').toUpperCase()})
               </div>
               <p className="ai-desc">
-                The AI will rephrase clues in the <strong>{theme || 'current'}</strong> style. Add a sub-tone if desired.
+                Set a <strong>Main Narrative Tone</strong> below. This will determine the voice and era of the entire case file.
               </p>
               <div className="ai-input-row">
                 <input
                   type="text"
                   value={customFlavor}
                   onChange={e => setCustomFlavor(e.target.value)}
-                  placeholder='optional tone: e.g. "gritty", "humorous"'
+                  placeholder='e.g. "Cyberpunk", "Victorian Mystery", "Gritty Noir"'
                   className="ai-input mono"
                   disabled={aiLoading}
                   onKeyDown={e => e.key === 'Enter' && runAiFlavor()}

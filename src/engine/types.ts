@@ -87,4 +87,5 @@ export type Puzzle = {
   weapons: AssetInfo[];
   locations: AssetInfo[];
   theme: string;
+  murdererIdx: number;
 };

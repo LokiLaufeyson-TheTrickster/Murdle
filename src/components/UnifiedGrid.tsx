@@ -57,13 +57,13 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
   };
 
   const renderWeaponIcon = (item: any, sz: number = 20) => {
-    const IconComp = WEAPON_ICONS[item.icon] || WEAPON_ICONS['Knife'];
-    return <IconComp size={sz} style={{ color: item.color || '#cc8866' }} />;
+    const IconComp = WEAPON_ICONS[item.icon] || WEAPON_ICONS['Target'];
+    return <IconComp size={sz} style={{ color: item.color || '#FFC107' }} />;
   };
 
   const renderLocationIcon = (item: any, sz: number = 20) => {
-    const IconComp = LOCATION_ICONS[item.icon] || LOCATION_ICONS['Building2'];
-    return <IconComp size={sz} style={{ color: item.color || '#5577aa' }} />;
+    const IconComp = LOCATION_ICONS[item.icon] || LOCATION_ICONS['Wind'];
+    return <IconComp size={sz} style={{ color: item.color || '#00E5FF' }} />;
   };
 
   return (

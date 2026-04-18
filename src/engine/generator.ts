@@ -116,6 +116,8 @@ export function generatePuzzle(seed: string, difficulty: Difficulty, size: numbe
     }
   }
 
+  const murdererIdx = seed.charCodeAt(0) % size;
+
   return {
     seed,
     difficulty,
@@ -125,6 +127,7 @@ export function generatePuzzle(seed: string, difficulty: Difficulty, size: numbe
     suspects,
     weapons,
     locations,
-    theme: themeName
+    theme: themeName,
+    murdererIdx
   };
 }
