@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Fingerprint, Swords, MapPin, Weight, MapPinned, Trees, Building, Eye, Star, Sun, CircleUser, Sparkles, Binary } from 'lucide-react';
 import type { AssetInfo, SuspectDetails, WeaponDetails, LocationDetails } from '../engine/types';
 import { SUSPECT_ICONS, WEAPON_ICONS, LOCATION_ICONS } from '../engine/narrative';
+import { ProceduralPrint } from './ProceduralPrint';
 
 interface EvidenceBoardProps {
   suspects: AssetInfo[];
@@ -197,6 +198,20 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
                             <span className="mono detail-label">PERSONNEL FILE</span>
                             <span className="detail-value backstory-display">{d.backstory}</span>
                           </div>
+
+                          <div className="trace-evidence-section">
+                            <div className="evidence-item">
+                              <span className="mono detail-label">BIOMETRIC: FINGERPRINT</span>
+                              <ProceduralPrint type="fingerprint" seed={d.fingerprintPattern} size={120} color={selectedAsset.color} />
+                              <span className="mono pattern-id">{d.fingerprintPattern}</span>
+                            </div>
+                            <div className="evidence-item">
+                              <span className="mono detail-label">FORENSIC: SHOEPRINT</span>
+                              <ProceduralPrint type="shoeprint" seed={d.shoeprintPattern} size={120} color={selectedAsset.color} />
+                              <span className="mono pattern-id">{d.shoeprintPattern}</span>
+                            </div>
+                          </div>
+
                           <div className="attr-grid-container">
                             {attrPool.map((a, i) => (
                               <div key={i} className="attr-chip-modern">
@@ -339,6 +354,16 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
           font-size: 1.1rem; line-height: 1.8; color: var(--text-dim);
           font-style: italic; font-family: 'Outfit', sans-serif;
         }
+
+        .trace-evidence-section {
+          display: flex; gap: 20px; margin-bottom: 32px;
+        }
+        .evidence-item {
+          flex: 1; display: flex; flex-direction: column; gap: 10px; align-items: center;
+          background: rgba(255,255,255,0.02); border: 1px solid var(--border-dim);
+          padding: 16px; border-radius: 12px;
+        }
+        .pattern-id { font-size: 0.6rem; opacity: 0.4; letter-spacing: 1px; }
 
         .attr-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
         .attr-chip-modern {

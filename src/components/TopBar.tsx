@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Difficulty } from '../engine/types';
-import { RefreshCw, ShieldAlert, Database, Crosshair, Menu, X } from 'lucide-react';
+import { RefreshCw, ShieldAlert, Database, Crosshair, Menu, X, Fingerprint } from 'lucide-react';
 
 interface TopBarProps {
   seed: string;

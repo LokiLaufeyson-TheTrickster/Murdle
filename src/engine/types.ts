@@ -40,6 +40,8 @@ export interface SuspectDetails {
   eyeColor: string;         // e.g. "hazel"
   hairColor: string;        // e.g. "auburn"
   handedness: 'left-handed' | 'right-handed';
+  fingerprintPattern?: string; // Procedurally generated pattern ID
+  shoeprintPattern?: string;   // Procedurally generated pattern ID
 }
 
 // ── Weapon attributes ─────────────────────────────────────────────

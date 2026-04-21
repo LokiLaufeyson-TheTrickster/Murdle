@@ -1,4 +1,4 @@
-import type { LogicState, Clue, Difficulty, Puzzle } from './types';
+import type { LogicState, Clue, Difficulty, Puzzle, SuspectDetails } from './types';
 import { solve, seededRandom } from './solver';
 import { THEMES, PROFESSIONS } from './narrative';
 
@@ -21,10 +21,18 @@ export function generatePuzzle(seed: string, difficulty: Difficulty, size: numbe
   const locations = SHUFFLE(theme.locations, rng).slice(0, size);
 
   // Assign backstories from pools
-  suspects.forEach(s => {
-    const prof = s.details.profession;
+  suspects.forEach((s, idx) => {
+    const details = s.details as SuspectDetails;
+    const prof = details.profession;
     const backstories = PROFESSIONS[prof] || ["A mysterious past shrouded in secrets."];
-    s.details.backstory = backstories[Math.floor(rng() * backstories.length)];
+    details.backstory = backstories[Math.floor(rng() * backstories.length)];
+    
+    // Procedural Print Generation
+    const patterns = ['Ulnar Loop', 'Radial Loop', 'Plain Whorl', 'Central Pocket Loop', 'Double Loop Whorl', 'Accidental Whorl', 'Plain Arch', 'Tented Arch'];
+    const shoeTypes = ['Lug Sole', 'Honeycomb', 'Chevron', 'Disk Ripple', 'Diamond Grid', 'Wave Grip', 'Circular Pivot', 'Fine Texture'];
+    
+    details.fingerprintPattern = `${patterns[Math.floor(rng() * patterns.length)]}-${seed.slice(0, 2)}-${idx}`;
+    details.shoeprintPattern = `${shoeTypes[Math.floor(rng() * shoeTypes.length)]}-${seed.slice(-2)}-${idx}`;
   });
 
   // 2. Generate Truth
@@ -35,8 +43,6 @@ export function generatePuzzle(seed: string, difficulty: Difficulty, size: numbe
 
   // Derived killer logic: Killer is the one with the highest index (arbitrary but derived)
   const murdererIdx = (seed.length + seed.charCodeAt(0)) % size;
-  const murderWeaponIdx = swTruth[murdererIdx];
-  const murderLocationIdx = slTruth[murdererIdx];
 
   // 3. Clue Pool Generation
   const allPossibleClues: Clue[] = [];
