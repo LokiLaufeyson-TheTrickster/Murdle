@@ -39,6 +39,7 @@ const AppInner: React.FC = () => {
   const [showTutorial, setShowTutorial] = useState(false);
   const [contextHtml, setContextHtml] = useState('');
   const [isReviewMode, setIsReviewMode] = useState(false);
+  const [initialEvidence, setInitialEvidence] = useState<{type: 'suspects'|'weapons'|'locations', name: string} | null>(null);
 
   useEffect(() => {
     const newPuzzle = generatePuzzle(seed, difficulty, size, theme);
@@ -59,7 +60,7 @@ const AppInner: React.FC = () => {
     setUserState({});
     setIsReviewMode(false);
     setEndgameState('playing');
-    setCharges(difficulty === 'Cadet' ? 5 : difficulty === 'Sergeant' ? 2 : 1);
+    setCharges(difficulty === 'Cadet' ? 5 : difficulty === 'Sergeant' ? 2 : difficulty === 'Inspector' ? 1 : 0);
   }, [seed, difficulty, size, theme]);
 
   useEffect(() => {
@@ -188,9 +189,10 @@ const AppInner: React.FC = () => {
               charges={charges}
               onNewGame={() => { setSeed(Math.random().toString(36).substring(7).toUpperCase()); setEndgameState('playing'); }}
               onUseContradiction={useContradiction}
-              onOpenDatabase={() => setShowEvidenceBoard(true)}
+              onOpenDatabase={() => { setInitialEvidence(null); setShowEvidenceBoard(true); }}
               onOpenAccuse={() => setShowAccuseWindow(true)}
               onBackToMenu={() => setGameState('menu')}
+              inferenceCount={puzzle.inferenceCount}
             />
             
             <main className="game-main">
@@ -198,6 +200,10 @@ const AppInner: React.FC = () => {
                 puzzle={puzzle}
                 userState={userState}
                 onCellClick={handleCellClick}
+                onHeaderClick={(type, name) => {
+                  setInitialEvidence({ type, name });
+                  setShowEvidenceBoard(true);
+                }}
                 isReviewMode={isReviewMode}
               />
               
@@ -240,6 +246,8 @@ const AppInner: React.FC = () => {
             weapons={puzzle.weapons}
             locations={puzzle.locations}
             onClose={() => setShowEvidenceBoard(false)}
+            initialTab={initialEvidence?.type}
+            initialAsset={initialEvidence?.name}
           />
         )}
       </AnimatePresence>

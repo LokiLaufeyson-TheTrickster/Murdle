@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Swords, MapPin, Weight, Fingerprint, MapPinned, Trees, Building, Eye, EyeOff, Star, Sun } from 'lucide-react';
+import { X, Fingerprint, Swords, MapPin, Weight, MapPinned, Trees, Building, Eye, Star, Sun, CircleUser, Sparkles, Binary } from 'lucide-react';
 import type { AssetInfo, SuspectDetails, WeaponDetails, LocationDetails } from '../engine/types';
 import { SUSPECT_ICONS, WEAPON_ICONS, LOCATION_ICONS } from '../engine/narrative';
 
@@ -9,6 +9,8 @@ interface EvidenceBoardProps {
   weapons: AssetInfo[];
   locations: AssetInfo[];
   onClose: () => void;
+  initialTab?: 'suspects' | 'weapons' | 'locations';
+  initialAsset?: string;
 }
 
 const isSuspectDetails = (d: any): d is SuspectDetails => 'handedness' in d;
@@ -59,10 +61,22 @@ const SettingBadge: React.FC<{ setting: string }> = ({ setting }) => {
   );
 };
 
-export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons, locations, onClose }) => {
-  const [activeTab, setActiveTab] = useState<'suspects' | 'weapons' | 'locations'>('suspects');
+export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons, locations, onClose, initialTab, initialAsset }) => {
+  const [activeTab, setActiveTab] = useState<'suspects' | 'weapons' | 'locations'>(initialTab || 'suspects');
   const [selectedAsset, setSelectedAsset] = useState<AssetInfo | null>(null);
-  const [showBackstory, setShowBackstory] = useState(false);
+
+  useEffect(() => {
+    if (initialAsset) {
+      const all = [...suspects, ...weapons, ...locations];
+      const found = all.find(a => a.name === initialAsset);
+      if (found) {
+        if (suspects.find(s => s.name === found.name)) setActiveTab('suspects');
+        else if (weapons.find(w => w.name === found.name)) setActiveTab('weapons');
+        else if (locations.find(l => l.name === found.name)) setActiveTab('locations');
+        setSelectedAsset(found);
+      }
+    }
+  }, [initialAsset, suspects, weapons, locations]);
 
   const getAssets = () => {
     if (activeTab === 'suspects') return suspects;
@@ -79,12 +93,9 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
       const IconComp = WEAPON_ICONS[item.icon] || WEAPON_ICONS['Target'];
       return <IconComp size={size} style={{ color: item.color || '#FFC107' }} />;
     }
-    // Location
     const IconComp = LOCATION_ICONS[item.icon] || LOCATION_ICONS['Wind'];
     return <IconComp size={size} style={{ color: item.color || '#00E5FF' }} />;
   };
-
-  const renderGridIcon = (item: AssetInfo) => renderIcon(item, 32);
 
   return (
     <motion.div
@@ -98,14 +109,14 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
         <div className="evidence-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <Fingerprint size={20} color="var(--accent-primary)" />
-            <h2 className="mono">CASE DOSSIER</h2>
+            <h2 className="mono">CENTRAL DATABASE</h2>
           </div>
           <button className="close-btn" onClick={onClose}><X size={22} /></button>
         </div>
 
         <div className="evidence-tabs mono">
           <button className={activeTab === 'suspects' ? 'active' : ''} onClick={() => { setActiveTab('suspects'); setSelectedAsset(null); }}>
-            <User size={16} /> SUSPECTS
+            <CircleUser size={16} /> SUSPECTS
           </button>
           <button className={activeTab === 'weapons' ? 'active' : ''} onClick={() => { setActiveTab('weapons'); setSelectedAsset(null); }}>
             <Swords size={16} /> WEAPONS
@@ -120,13 +131,18 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
             {getAssets().map((asset, idx) => (
               <motion.div
                 key={asset.name}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.04 }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: idx * 0.03 }}
                 className={`asset-card ${selectedAsset?.name === asset.name ? 'selected' : ''}`}
-                onClick={() => { setSelectedAsset(asset); setShowBackstory(false); }}
+                onClick={() => setSelectedAsset(asset)}
               >
-                {renderGridIcon(asset)}
+                <div className="asset-icon-wrapper" style={{ borderColor: asset.color }}>
+                   {(() => {
+                      const IconComp = (activeTab === 'suspects' ? SUSPECT_ICONS[asset.icon] : activeTab === 'weapons' ? WEAPON_ICONS[asset.icon] : LOCATION_ICONS[asset.icon]) || Fingerprint;
+                      return <IconComp size={32} style={{ color: asset.color }} />;
+                   })()}
+                </div>
                 <span className="mono asset-name">{asset.name}</span>
               </motion.div>
             ))}
@@ -137,129 +153,98 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
               {selectedAsset ? (
                 <motion.div
                   key={selectedAsset.name}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
                   className="details-content"
                 >
                   <div className="details-hero">
-                    <div className="details-hero-icon">
-                      {renderIcon(selectedAsset, 52)}
+                    <div className="details-hero-icon" style={{ boxShadow: `0 0 30px ${selectedAsset.color}44` }}>
+                      {renderIcon(selectedAsset, 64)}
                     </div>
                     <div>
                       <h3 className="mono">{selectedAsset.name}</h3>
-                      {/* Tab-specific badges */}
-                      {activeTab === 'weapons' && isWeaponDetails(selectedAsset.details) && (
-                        <WeightBadge weight={selectedAsset.details.weight} />
-                      )}
-                      {activeTab === 'locations' && isLocationDetails(selectedAsset.details) && (
-                        <SettingBadge setting={selectedAsset.details.setting} />
-                      )}
-                      {activeTab === 'suspects' && isSuspectDetails(selectedAsset.details) && (
-                        <span style={{
-                          fontFamily: 'JetBrains Mono', fontSize: '0.65rem',
-                          color: 'var(--text-dim)', letterSpacing: '1px'
-                        }}>
-                          {selectedAsset.details.handedness.toUpperCase()}
-                        </span>
-                      )}
+                      <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                        {activeTab === 'weapons' && isWeaponDetails(selectedAsset.details) && (
+                          <WeightBadge weight={selectedAsset.details.weight} />
+                        )}
+                        {activeTab === 'locations' && isLocationDetails(selectedAsset.details) && (
+                          <SettingBadge setting={selectedAsset.details.setting} />
+                        )}
+                        {activeTab === 'suspects' && isSuspectDetails(selectedAsset.details) && (
+                          <>
+                            <span className="badge-modern grey">{selectedAsset.details.profession}</span>
+                            <span className="badge-modern outline">{selectedAsset.details.gender?.toUpperCase() || 'UNKNOWN'}</span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
 
                   <div className="details-grid">
-                    {/* SUSPECT */}
                     {activeTab === 'suspects' && isSuspectDetails(selectedAsset.details) && (() => {
                       const d = selectedAsset.details;
+                      const attrPool = [
+                        { label: 'HEIGHT', val: d.height, icon: <Binary size={12} /> },
+                        { label: 'SUN SIGN', val: d.sunSign, icon: <Sun size={12} /> },
+                        { label: 'EYE COLOR', val: d.eyeColor, icon: <Eye size={12} /> },
+                        { label: 'HAIR', val: d.hairColor, icon: <Sparkles size={12} /> },
+                        { label: 'HAND', val: d.handedness, icon: <Fingerprint size={12} /> }
+                      ];
                       return (
                         <>
-                          <button className="backstory-toggle" onClick={() => setShowBackstory(!showBackstory)}>
-                            {showBackstory ? <EyeOff size={14} /> : <Eye size={14} />}
-                            <span className="mono">{showBackstory ? 'HIDE BACKSTORY' : 'READ DOSSIER'}</span>
-                          </button>
-                          {showBackstory && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              className="backstory-text"
-                            >
-                              {d.backstory}
-                            </motion.div>
-                          )}
-                          <div className="attr-row">
-                            <div className="attr-chip">
-                              <span className="attr-label mono">HEIGHT</span>
-                              <span className="attr-val">{d.height}</span>
-                            </div>
-                            <div className="attr-chip">
-                              <span className="attr-label mono">
-                                <Sun size={12} style={{ display: 'inline', marginRight: '4px' }} />
-                                SUN SIGN
-                              </span>
-                              <span className="attr-val">{d.sunSign}</span>
-                            </div>
+                          <div className="detail-item dossier-section">
+                            <span className="mono detail-label">PERSONNEL FILE</span>
+                            <span className="detail-value backstory-display">{d.backstory}</span>
                           </div>
-                          <div className="attr-row">
-                            <div className="attr-chip">
-                              <span className="attr-label mono">EYE COLOR</span>
-                              <span className="attr-val">{d.eyeColor}</span>
-                            </div>
-                            <div className="attr-chip">
-                              <span className="attr-label mono">HAIR</span>
-                              <span className="attr-val">{d.hairColor}</span>
-                            </div>
-                          </div>
-                          <div className="attr-chip">
-                            <span className="attr-label mono">DOMINANT HAND</span>
-                            <span className="attr-val" style={{ color: 'var(--accent-primary)' }}>{d.handedness}</span>
+                          <div className="attr-grid-container">
+                            {attrPool.map((a, i) => (
+                              <div key={i} className="attr-chip-modern">
+                                <span className="attr-label mono">{a.icon} {a.label}</span>
+                                <span className="attr-val">{a.val}</span>
+                              </div>
+                            ))}
                           </div>
                         </>
                       );
                     })()}
 
-                    {/* WEAPON */}
                     {activeTab === 'weapons' && isWeaponDetails(selectedAsset.details) && (() => {
                       const d = selectedAsset.details;
                       return (
                         <>
                           <div className="detail-item">
-                            <span className="mono detail-label">DESCRIPTION</span>
+                            <span className="mono detail-label">INTEL REPORT</span>
                             <span className="detail-value">{d.description}</span>
                           </div>
-                          <div className="attr-row">
-                            <div className="attr-chip">
-                              <span className="attr-label mono">WEIGHT CLASS</span>
-                              <WeightBadge weight={d.weight} />
+                          <div className="attr-grid-container">
+                            <div className="attr-chip-modern">
+                              <span className="attr-label mono"><Weight size={12} /> WEIGHT</span>
+                              <span className="attr-val" style={{ textTransform: 'capitalize' }}>{d.weight}</span>
                             </div>
-                            <div className="attr-chip">
-                              <span className="attr-label mono">MATERIAL</span>
+                            <div className="attr-chip-modern">
+                              <span className="attr-label mono"><Binary size={12} /> COMPOSITION</span>
                               <span className="attr-val">{d.madeOf}</span>
                             </div>
                           </div>
-                          <div className="detail-item scene-clue">
-                            <span className="mono detail-label">
-                              <MapPinned size={12} style={{ display: 'inline', marginRight: '6px' }} />
-                              SCENE TRACE
-                            </span>
+                          <div className="detail-item scene-clue-premium">
+                            <span className="mono detail-label"><MapPinned size={15} style={{marginRight:8}}/> SCENE TRACE</span>
                             <span className="detail-value scene-trace">{d.locationClue}</span>
                           </div>
                         </>
                       );
                     })()}
 
-                    {/* LOCATION */}
                     {activeTab === 'locations' && isLocationDetails(selectedAsset.details) && (() => {
                       const d = selectedAsset.details;
                       return (
                         <>
                           <div className="detail-item">
-                            <span className="mono detail-label">DESCRIPTION</span>
+                            <span className="mono detail-label">SURVEILLANCE LOG</span>
                             <span className="detail-value">{d.descriptor}</span>
                           </div>
-                          <div className="detail-item scene-clue">
-                            <span className="mono detail-label">
-                              <Star size={12} style={{ display: 'inline', marginRight: '6px' }} />
-                              TRACE FEATURE
-                            </span>
+                          <div className="detail-item scene-clue-premium">
+                            <span className="mono detail-label"><Star size={15} style={{marginRight:8}}/> DISTINGUISHING FEATURE</span>
                             <span className="detail-value scene-trace">{d.traceFeature}</span>
                           </div>
                         </>
@@ -268,7 +253,12 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
                   </div>
                 </motion.div>
               ) : (
-                <div className="empty-details mono">SELECT A DOSSIER ENTRY TO VIEW DETAILS</div>
+                <div className="empty-details">
+                  <motion.div animate={{ opacity: [0.2, 0.5, 0.2] }} transition={{ repeat: Infinity, duration: 2 }} style={{ textAlign: 'center' }}>
+                    <Binary size={48} style={{ marginBottom: '16px', opacity: 0.1 }} />
+                    <div className="mono" style={{ fontSize: '0.8rem', letterSpacing: '4px' }}>ACCESSING DATA... SELECT ENTRY</div>
+                  </motion.div>
+                </div>
               )}
             </AnimatePresence>
           </div>
@@ -277,212 +267,99 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
 
       <style dangerouslySetInnerHTML={{ __html: `
         .evidence-board-overlay {
-          position: fixed;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0,0,0,0.85);
-          z-index: 2000;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 20px;
+          position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+          z-index: 2000; display: flex; align-items: center; justify-content: center;
+          padding: 40px;
         }
         .evidence-board-container {
-          width: 100%;
-          max-width: 1100px;
-          max-height: 90vh;
-          display: flex;
-          flex-direction: column;
-          border: 1px solid var(--accent-primary);
-          box-shadow: 0 0 60px rgba(0,210,255,0.08);
-          overflow: hidden;
+          width: 100%; max-width: 1200px; height: 85vh;
+          display: flex; flex-direction: column;
+          border: 1px solid var(--border-bright);
+          background: rgba(10,12,18,0.95);
+          box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+          overflow: hidden; border-radius: 16px;
         }
         .evidence-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 18px 24px;
-          border-bottom: 1px solid var(--border-bright);
-          flex-shrink: 0;
+          display: flex; justify-content: space-between; align-items: center;
+          padding: 24px 32px; border-bottom: 1px solid var(--border-dim);
         }
-        .evidence-header h2 { color: var(--accent-primary); font-size: 1rem; letter-spacing: 4px; }
-        .close-btn { background: none; border: none; color: var(--text-dim); cursor: pointer; transition: color 0.2s; }
-        .close-btn:hover { color: var(--error); }
+        .evidence-header h2 { color: var(--accent-primary); font-size: 0.9rem; letter-spacing: 5px; margin: 0; }
+        .close-btn { background: none; border: none; color: var(--text-dim); cursor: pointer; transition: all 0.2s; }
+        .close-btn:hover { color: var(--error); transform: rotate(90deg); }
         
-        .evidence-tabs {
-          display: flex;
-          border-bottom: 1px solid var(--border-dim);
-          background: rgba(0,0,0,0.2);
-          flex-shrink: 0;
-        }
+        .evidence-tabs { display: flex; background: rgba(0,0,0,0.4); }
         .evidence-tabs button {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 10px;
-          padding: 14px;
-          background: none;
-          border: none;
-          color: var(--text-dim);
-          font-weight: 700;
-          font-size: 0.75rem;
-          letter-spacing: 1px;
-          cursor: pointer;
-          transition: all 0.2s;
+          flex: 1; padding: 18px; border: none; background: none;
+          color: var(--text-dim); cursor: pointer; transition: all 0.3s;
+          font-weight: 800; font-size: 0.75rem; letter-spacing: 2px;
+          display: flex; align-items: center; justify-content: center; gap: 12px;
+          border-bottom: 2px solid transparent;
         }
-        .evidence-tabs button:hover { background: rgba(255,255,255,0.04); color: var(--text-main); }
         .evidence-tabs button.active {
-          background: rgba(0,210,255,0.07);
-          color: var(--accent-primary);
-          border-bottom: 2px solid var(--accent-primary);
+          color: var(--accent-primary); background: rgba(0,210,255,0.05);
+          border-bottom-color: var(--accent-primary);
         }
 
-        .evidence-content {
-          display: flex;
-          flex: 1;
-          min-height: 0;
-          overflow: hidden;
-        }
+        .evidence-content { display: flex; flex: 1; overflow: hidden; }
         .asset-grid {
-          width: 440px; /* Fixed width for structured 3-column grid */
-          padding: 20px;
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          grid-auto-rows: min-content;
-          gap: 12px;
-          overflow-y: auto;
-          border-right: 1px solid var(--border-dim);
-          background: rgba(0,0,0,0.1);
+          width: 380px; padding: 24px; display: grid; grid-template-columns: repeat(2, 1fr);
+          gap: 16px; overflow-y: auto; background: rgba(0,0,0,0.2); border-right: 1px solid var(--border-dim);
         }
         .asset-card {
-          aspect-ratio: 1 / 1.1; /* Keep them square-ish */
-          background: rgba(255,255,255,0.02);
-          border: 1px solid var(--border-dim);
-          border-radius: 10px;
-          padding: 12px 8px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          gap: 8px;
-          cursor: pointer;
-          transition: all 0.18s;
+          padding: 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-dim);
+          border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 12px;
+          cursor: pointer; transition: all 0.2s;
         }
-        .asset-card:hover {
-          background: rgba(255,255,255,0.06);
-          transform: translateY(-3px);
-          border-color: var(--border-bright);
-        }
-        .asset-card.selected {
-          border-color: var(--accent-primary);
-          background: rgba(0,210,255,0.04);
-          box-shadow: 0 0 16px rgba(0,210,255,0.12);
-        }
-        .asset-name { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px; color: var(--text-dim); }
-
-        .asset-details-pane {
-          width: 55%;
-          padding: 28px;
-          display: flex;
-          flex-direction: column;
-          overflow-y: auto;
-        }
-        .empty-details {
-          height: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: var(--text-dim);
-          opacity: 0.35;
-          text-align: center;
-          letter-spacing: 2px;
-          font-size: 0.75rem;
-        }
-        .details-hero {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-          margin-bottom: 28px;
-          padding-bottom: 20px;
-          border-bottom: 1px solid var(--border-dim);
-        }
-        .details-hero-icon {
-          padding: 12px;
-          background: rgba(255,255,255,0.03);
-          border-radius: 12px;
-          border: 1px solid var(--border-dim);
-          flex-shrink: 0;
-        }
-        .details-hero h3 { font-size: 1.4rem; color: var(--text-main); margin-bottom: 6px; }
+        .asset-card:hover { border-color: var(--accent-primary); background: rgba(0,210,255,0.03); transform: scale(1.02); }
+        .asset-card.selected { border-color: var(--accent-primary); background: rgba(0,210,255,0.08); box-shadow: 0 0 20px rgba(0,210,255,0.1); }
         
-        .details-grid { display: flex; flex-direction: column; gap: 18px; }
-        .detail-item { display: flex; flex-direction: column; gap: 6px; }
-        .detail-label {
-          color: var(--accent-primary);
-          font-size: 0.65rem;
-          font-weight: 800;
-          letter-spacing: 1.5px;
-          display: flex;
-          align-items: center;
-        }
-        .detail-value {
-          color: var(--text-bright);
-          font-size: 0.95rem;
-          line-height: 1.6;
-          font-family: 'Outfit', sans-serif;
+        .asset-icon-wrapper {
+          padding: 12px; border-radius: 12px;
+          background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .scene-clue {
-          background: rgba(0,210,255,0.04);
-          border: 1px solid rgba(0,210,255,0.15);
-          border-radius: 8px;
-          padding: 12px 14px;
+        .asset-details-pane { flex: 1; padding: 40px; overflow-y: auto; }
+        .details-hero { display: flex; align-items: flex-start; gap: 32px; margin-bottom: 40px; }
+        .details-hero-icon {
+          padding: 24px; background: rgba(0,0,0,0.3); border-radius: 20px;
+          border: 1px solid var(--border-bright); flex-shrink: 0;
         }
-        .scene-trace {
-          font-style: italic;
-          color: var(--text-dim) !important;
-          font-size: 0.9rem !important;
+        .details-hero h3 { font-size: 2.2rem; color: var(--text-bright); margin: 0; }
+        
+        .badge-modern {
+          padding: 4px 10px; border-radius: 4px; font-family: 'JetBrains Mono';
+          font-size: 0.65rem; font-weight: 800; letter-spacing: 1px;
+        }
+        .badge-modern.grey { background: rgba(255,255,255,0.05); color: var(--text-dim); }
+        .badge-modern.outline { border: 1px solid var(--accent-primary); color: var(--accent-primary); }
+
+        .dossier-section { margin-bottom: 32px; }
+        .backstory-display {
+          font-size: 1.1rem; line-height: 1.8; color: var(--text-dim);
+          font-style: italic; font-family: 'Outfit', sans-serif;
         }
 
-        /* Suspect attrs */
-        .backstory-toggle {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid var(--border-dim);
-          border-radius: 6px;
-          color: var(--text-dim);
-          padding: 8px 14px;
-          cursor: pointer;
-          font-size: 0.7rem;
-          font-weight: 700;
-          letter-spacing: 1px;
-          transition: all 0.2s;
+        .attr-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .attr-chip-modern {
+          background: rgba(255,255,255,0.02); border: 1px solid var(--border-dim);
+          border-radius: 8px; padding: 14px 18px; display: flex; flex-direction: column; gap: 6px;
         }
-        .backstory-toggle:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
-        .backstory-text {
-          font-size: 0.9rem;
-          line-height: 1.7;
-          color: var(--text-dim);
-          font-style: italic;
-          padding: 12px 0;
-          border-bottom: 1px solid var(--border-dim);
-          overflow: hidden;
-        }
-        .attr-row { display: flex; gap: 12px; flex-wrap: wrap; }
-        .attr-chip { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
-        .attr-label { font-size: 0.6rem; color: var(--accent-primary); letter-spacing: 1px; display: flex; align-items: center; }
-        .attr-val { font-size: 0.9rem; color: var(--text-main); font-family: 'Outfit', sans-serif; }
+        .attr-label { color: var(--accent-primary); font-size: 0.65rem; letter-spacing: 2px; display: flex; align-items: center; gap: 6px; }
+        .attr-val { color: var(--text-main); font-size: 1rem; font-weight: 600; }
 
-        /* Mobile */
-        @media (max-width: 700px) {
+        .scene-clue-premium {
+          margin-top: 24px; padding: 24px; background: rgba(0,210,255,0.04);
+          border-left: 4px solid var(--accent-primary); border-radius: 4px;
+        }
+        .detail-label { color: var(--accent-primary); font-size: 0.7rem; font-weight: 800; letter-spacing: 4px; margin-bottom: 12px; display: block; }
+        
+        @media (max-width: 900px) {
+          .evidence-board-overlay { padding: 10px; }
+          .evidence-board-container { height: 95vh; }
+          .asset-grid { width: 100%; border-right: none; height: 180px; flex-shrink: 0; display: flex; overflow-x: auto; }
+          .asset-card { min-width: 120px; aspect-ratio: unset; flex-shrink: 0; }
           .evidence-content { flex-direction: column; }
-          .asset-grid { width: 100%; border-right: none; border-bottom: 1px solid var(--border-dim); max-height: 220px; }
-          .asset-details-pane { width: 100%; }
-          .evidence-board-overlay { padding: 8px; align-items: flex-start; }
-          .evidence-board-container { max-height: 96vh; }
         }
       `}} />
     </motion.div>

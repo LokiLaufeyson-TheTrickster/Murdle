@@ -6,10 +6,11 @@ interface UnifiedGridProps {
   puzzle: Puzzle;
   userState: { [key: string]: { val: number, auto?: boolean } };
   onCellClick: (gridType: string, row: number, col: number) => void;
+  onHeaderClick?: (type: 'suspects' | 'weapons' | 'locations', name: string) => void;
   isReviewMode?: boolean;
 }
 
-export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onCellClick, isReviewMode }) => {
+export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onCellClick, onHeaderClick, isReviewMode }) => {
   const { size, suspects, weapons, locations, solution } = puzzle;
 
   const renderCell = (gridType: 'SW' | 'WL' | 'SL', localR: number, localC: number, globalR: number, globalC: number) => {
@@ -78,7 +79,9 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
 
           {/* Top Headers: Suspects */}
           {suspects.map((s, i) => (
-            <div key={`th-s-${i}`} className="header-cell top" style={{ borderRight: i === size - 1 ? '3px solid var(--grid-line-bold)' : '1px solid var(--grid-line)', borderBottom: '3px solid var(--grid-line-bold)' }}>
+            <div key={`th-s-${i}`} className="header-cell top clickable" 
+                 style={{ borderRight: i === size - 1 ? '3px solid var(--grid-line-bold)' : '1px solid var(--grid-line)', borderBottom: '3px solid var(--grid-line-bold)' }}
+                 onClick={() => onHeaderClick?.('suspects', s.name)}>
               <div className="header-content top">
                 <span className="handwritten label top-label">{s.name}</span>
                 <div style={{ transform: i % 2 === 0 ? 'rotate(5deg)' : 'rotate(-5deg)' }}>{renderSuspectIcon(s)}</div>
@@ -88,7 +91,9 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
 
           {/* Top Headers: Locations */}
           {locations.map((l, i) => (
-            <div key={`th-l-${i}`} className="header-cell top" style={{ borderRight: i === size - 1 ? '3px solid var(--grid-line-bold)' : '1px solid var(--grid-line)', borderBottom: '3px solid var(--grid-line-bold)' }}>
+            <div key={`th-l-${i}`} className="header-cell top clickable" 
+                 style={{ borderRight: i === size - 1 ? '3px solid var(--grid-line-bold)' : '1px solid var(--grid-line)', borderBottom: '3px solid var(--grid-line-bold)' }}
+                 onClick={() => onHeaderClick?.('locations', l.name)}>
               <div className="header-content top">
                 <span className="handwritten label top-label">{l.name}</span>
                 <div style={{ transform: i % 2 === 0 ? 'rotate(-3deg)' : 'rotate(3deg)' }}>{renderLocationIcon(l)}</div>
@@ -100,7 +105,9 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
           {Array.from({ length: size * 2 }).map((_, r) => (
             <React.Fragment key={`row-${r}`}>
               {/* Side Header */}
-              <div className="header-cell side" style={{ borderBottom: r === size - 1 ? '3px solid var(--grid-line-bold)' : '1px solid var(--grid-line)', borderRight: '3px solid var(--grid-line-bold)' }}>
+              <div className="header-cell side clickable" 
+                   style={{ borderBottom: r === size - 1 ? '3px solid var(--grid-line-bold)' : '1px solid var(--grid-line)', borderRight: '3px solid var(--grid-line-bold)' }}
+                   onClick={() => r < size ? onHeaderClick?.('weapons', weapons[r].name) : onHeaderClick?.('locations', locations[r - size].name)}>
                 <div className="header-content side">
                   <span className="handwritten label">{r < size ? weapons[r].name : locations[r - size].name}</span>
                   <div style={{ transform: r % 2 === 0 ? 'rotate(4deg)' : 'rotate(-4deg)', flexShrink: 0 }}>
@@ -192,6 +199,13 @@ export const UnifiedGrid: React.FC<UnifiedGridProps> = ({ puzzle, userState, onC
           align-items: center;
           justify-content: center;
           position: relative;
+        }
+        .header-cell.clickable {
+          cursor: pointer;
+        }
+        .header-cell.clickable:hover {
+          background: rgba(255,255,255,0.08);
+          box-shadow: inset 0 0 15px var(--accent-glow);
         }
         .header-cell.top {
           height: var(--header-h);

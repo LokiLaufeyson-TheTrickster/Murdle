@@ -32,7 +32,9 @@ export type Clue = {
 
 // ── Suspect attributes ────────────────────────────────────────────
 export interface SuspectDetails {
+  profession: string;       // e.g. "Software Engineer"
   backstory: string;
+  gender: 'male' | 'female' | 'non-binary';
   height: string;           // e.g. "5ft 9in"
   sunSign: string;          // e.g. "Scorpio"
   eyeColor: string;         // e.g. "hazel"
@@ -88,4 +90,5 @@ export type Puzzle = {
   locations: AssetInfo[];
   theme: string;
   murdererIdx: number;
+  inferenceCount: number;
 };

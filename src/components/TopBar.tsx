@@ -11,6 +11,7 @@ interface TopBarProps {
   theme: string;
   setTheme: (t: string) => void;
   charges: number;
+  inferenceCount: number;
   onNewGame: () => void;
   onUseContradiction: () => void;
   onOpenDatabase: () => void;
@@ -20,16 +21,15 @@ interface TopBarProps {
 
 // Compact logo for TopBar
 const LogoMark: React.FC = () => (
-  <img 
-    src="/logo.png" 
-    alt="Logo" 
-    style={{ width: 32, height: 32, objectFit: 'contain' }} 
-  />
+  <div style={{ position: 'relative' }}>
+    <Fingerprint size={32} color="var(--accent-primary)" style={{ opacity: 0.8 }} />
+    <div style={{ position: 'absolute', top: -5, right: -5, background: 'var(--accent-secondary)', width: 12, height: 12, borderRadius: '50%', border: '2px solid var(--bg-color)' }} />
+  </div>
 );
 
 export const TopBar: React.FC<TopBarProps> = ({ 
   seed, difficulty, setDifficulty, size, setSize, theme, setTheme,
-  charges, onNewGame, onUseContradiction, onOpenDatabase, onOpenAccuse, onBackToMenu
+  charges, inferenceCount, onNewGame, onUseContradiction, onOpenDatabase, onOpenAccuse, onBackToMenu
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -38,9 +38,12 @@ export const TopBar: React.FC<TopBarProps> = ({
       <div className="top-bar glass">
         <div className="brand-section">
           <LogoMark />
-          <div>
+          <div style={{ marginLeft: '12px' }}>
             <h1 className="logo-text">TheDeductionist</h1>
-            <div className="badge seed mono">{seed}</div>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <div className="badge seed mono">{seed}</div>
+              <div className="badge inference mono">{inferenceCount} STEPS</div>
+            </div>
           </div>
         </div>
         
@@ -188,6 +191,8 @@ export const TopBar: React.FC<TopBarProps> = ({
           color: var(--text-dim);
           display: inline-block;
         }
+        .badge.seed { border-color: var(--border-dim); }
+        .badge.inference { border-color: rgba(0, 255, 163, 0.3); color: #00ffa3; }
         
         .controls-group {
           display: flex;

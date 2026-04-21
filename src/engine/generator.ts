@@ -1,6 +1,6 @@
 import type { LogicState, Clue, Difficulty, Puzzle } from './types';
 import { solve, seededRandom } from './solver';
-import { THEMES } from './narrative';
+import { THEMES, PROFESSIONS } from './narrative';
 
 const SHUFFLE = <T>(array: T[], random: () => number): T[] => {
   const arr = [...array];
@@ -14,109 +14,107 @@ const SHUFFLE = <T>(array: T[], random: () => number): T[] => {
 export function generatePuzzle(seed: string, difficulty: Difficulty, size: number, themeName = 'Modern'): Puzzle {
   const rng = seededRandom(seed);
   
-  // 1. Pick Assets based on Theme
+  // 1. Pick Assets
   const theme = THEMES[themeName] || THEMES.Modern;
   const suspects = SHUFFLE(theme.suspects, rng).slice(0, size);
   const weapons = SHUFFLE(theme.weapons, rng).slice(0, size);
   const locations = SHUFFLE(theme.locations, rng).slice(0, size);
 
+  // Assign backstories from pools
+  suspects.forEach(s => {
+    const prof = s.details.profession;
+    const backstories = PROFESSIONS[prof] || ["A mysterious past shrouded in secrets."];
+    s.details.backstory = backstories[Math.floor(rng() * backstories.length)];
+  });
+
   // 2. Generate Truth
   const swTruth = SHUFFLE(Array.from({ length: size }, (_, i) => i), rng);
   const wlTruth = SHUFFLE(Array.from({ length: size }, (_, i) => i), rng);
   const slTruth = swTruth.map(wIdx => wlTruth[wIdx]);
-
   const solution: LogicState = { sw: swTruth, wl: wlTruth, sl: slTruth };
+
+  // Derived killer logic: Killer is the one with the highest index (arbitrary but derived)
+  const murdererIdx = (seed.length + seed.charCodeAt(0)) % size;
+  const murderWeaponIdx = swTruth[murdererIdx];
+  const murderLocationIdx = slTruth[murdererIdx];
 
   // 3. Clue Pool Generation
   const allPossibleClues: Clue[] = [];
+  const addClue = (type: any, variables: any[], isNegative: boolean) => {
+    allPossibleClues.push({
+      id: `${type}-${variables.map(v => `${v.i || v.j}-${v.j || v.k}`).join('-')}-${isNegative}-${rng()}`,
+      type, variables, isNegative, text: ''
+    });
+  };
 
+  // SW clues
   for (let i = 0; i < size; i++) {
     for (let j = 0; j < size; j++) {
-      const isTrue = swTruth[i] === j;
-      allPossibleClues.push({
-        id: `sw-${i}-${j}-${isTrue}`,
-        type: isTrue ? 'DIRECT' : 'NEGATIVE',
-        variables: [{ type: 'SW', i, j }],
-        isNegative: !isTrue,
-        text: '',
-      });
+      addClue(swTruth[i] === j ? 'DIRECT' : 'NEGATIVE', [{ type: 'SW', i, j }], swTruth[i] !== j);
     }
   }
-
+  // WL clues
   for (let j = 0; j < size; j++) {
     for (let k = 0; k < size; k++) {
-      const isTrue = wlTruth[j] === k;
-      allPossibleClues.push({
-        id: `wl-${j}-${k}-${isTrue}`,
-        type: 'LOCATION_WEAPON',
-        variables: [{ type: 'WL', j, k }],
-        isNegative: !isTrue,
-        text: '',
-      });
+      addClue('LOCATION_WEAPON', [{ type: 'WL', j, k }], wlTruth[j] !== k);
     }
   }
-
+  // SL clues
   for (let i = 0; i < size; i++) {
     for (let k = 0; k < size; k++) {
-      const isTrue = slTruth[i] === k;
-      allPossibleClues.push({
-        id: `sl-${i}-${k}-${isTrue}`,
-        type: 'SUSPECT_LOCATION',
-        variables: [{ type: 'SL', i, k }],
-        isNegative: !isTrue,
-        text: '',
-      });
+      addClue('SUSPECT_LOCATION', [{ type: 'SL', i, k }], slTruth[i] !== k);
     }
   }
 
   // 4. Constructive Addition
-  let cluePool = allPossibleClues.filter(c => {
+  let cluePool = SHUFFLE(allPossibleClues.filter(c => {
     const v = c.variables[0];
-    if (v.type === 'SW') {
-      const match = swTruth[v.i] === v.j;
-      return c.isNegative ? !match : match;
-    }
-    if (v.type === 'WL') {
-      const match = wlTruth[v.j] === v.k;
-      return c.isNegative ? !match : match;
-    }
-    if (v.type === 'SL') {
-      const match = slTruth[v.i] === v.k;
-      return c.isNegative ? !match : match;
-    }
+    if (v.type === 'SW') return c.isNegative ? swTruth[v.i] !== v.j : swTruth[v.i] === v.j;
+    if (v.type === 'WL') return c.isNegative ? wlTruth[v.j] !== v.k : wlTruth[v.j] === v.k;
+    if (v.type === 'SL') return c.isNegative ? slTruth[v.i] !== v.k : slTruth[v.i] === v.k;
     return false;
-  });
-
-  cluePool = SHUFFLE(cluePool, rng);
+  }), rng);
 
   const selectedClues: Clue[] = [];
+  const isResolved = (clues: Clue[]) => {
+    const sols = solve(size, clues, 10);
+    if (sols.length === 0) return false;
+    
+    // Easy modes require full grid resolution
+    if (difficulty === 'Cadet' || difficulty === 'Sergeant') {
+      return sols.length === 1;
+    }
+    
+    // Harder modes only require catching the killer (suspect, weapon, location triad)
+    const killerW = swTruth[murdererIdx];
+    const killerL = slTruth[murdererIdx];
+    return sols.every(s => s.sw[murdererIdx] === killerW && s.sl[murdererIdx] === killerL);
+  };
+
   for (const clue of cluePool) {
     selectedClues.push(clue);
-    const solutions = solve(size, selectedClues, 2);
-    if (solutions.length === 1) break; 
+    if (isResolved(selectedClues)) break;
   }
 
-  // Destructive Pruning: Minimize clue set
+  // 5. Destructive Pruning (Keep it challenging)
   for (let i = selectedClues.length - 1; i >= 0; i--) {
     const testClues = selectedClues.filter((_, idx) => idx !== i);
-    const solutions = solve(size, testClues, 2);
-    if (solutions.length === 1) {
+    if (isResolved(testClues)) {
       selectedClues.splice(i, 1);
     }
   }
 
-  const redundancyMap: any = { 'Cadet': 1, 'Sergeant': 0, 'Inspector': 0, 'Special Agent': 0 };
-  const extraNeeded = redundancyMap[difficulty] || 0;
-  let extraAdded = 0;
-  for (const clue of cluePool) {
-    if (extraAdded >= extraNeeded) break;
-    if (!selectedClues.includes(clue)) {
-      selectedClues.push(clue);
-      extraAdded++;
-    }
-  }
+  // Final Clue Sorting: Push clues involving the murderer to the end
+  selectedClues.sort((a, b) => {
+    const aInvolvesKiller = a.variables.some(v => (v.type === 'SW' && v.i === murdererIdx) || (v.type === 'SL' && v.i === murdererIdx) || (v.type === 'WL' && v.j === swTruth[murdererIdx]));
+    const bInvolvesKiller = b.variables.some(v => (v.type === 'SW' && v.i === murdererIdx) || (v.type === 'SL' && v.i === murdererIdx) || (v.type === 'WL' && v.j === swTruth[murdererIdx]));
+    if (aInvolvesKiller && !bInvolvesKiller) return 1;
+    if (!aInvolvesKiller && bInvolvesKiller) return -1;
+    return 0;
+  });
 
-  const murdererIdx = seed.charCodeAt(0) % size;
+  // Calculate Inference Count (Simplified: 1.5x per clue + negative multiplier)
+  const inferenceCount = selectedClues.reduce((acc, c) => acc + (c.isNegative ? 2 : 1), 0) + (size - 3) * 2;
 
   return {
     seed,
@@ -128,6 +126,7 @@ export function generatePuzzle(seed: string, difficulty: Difficulty, size: numbe
     weapons,
     locations,
     theme: themeName,
-    murdererIdx
+    murdererIdx,
+    inferenceCount
   };
 }
