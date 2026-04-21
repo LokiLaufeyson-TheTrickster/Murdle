@@ -41,19 +41,27 @@ export function generatePuzzle(seed: string, difficulty: Difficulty, size: numbe
   const slTruth = swTruth.map(wIdx => wlTruth[wIdx]);
   const solution: LogicState = { sw: swTruth, wl: wlTruth, sl: slTruth };
 
-  // Assign trace evidence based on truth
+  // Assign trace evidence based on truth (SELECTIVELY)
+  // We pick 1 weapon and 1 location to have explicit trace prints
+  const forensicWeaponIdx = Math.floor(rng() * size);
+  const forensicLocationIdx = Math.floor(rng() * size);
+
   suspects.forEach((s, i) => {
     const sDetails = s.details as SuspectDetails;
     
     // Weapon used by suspect i
     const weaponIdx = swTruth[i];
-    const wDetails = weapons[weaponIdx].details as WeaponDetails;
-    wDetails.foundFingerprint = sDetails.fingerprintPattern;
+    if (weaponIdx === forensicWeaponIdx) {
+      const wDetails = weapons[weaponIdx].details as WeaponDetails;
+      wDetails.foundFingerprint = sDetails.fingerprintPattern;
+    }
 
     // Location where suspect i was
     const locationIdx = slTruth[i];
-    const lDetails = locations[locationIdx].details as LocationDetails;
-    lDetails.foundShoeprint = sDetails.shoeprintPattern;
+    if (locationIdx === forensicLocationIdx) {
+      const lDetails = locations[locationIdx].details as LocationDetails;
+      lDetails.foundShoeprint = sDetails.shoeprintPattern;
+    }
   });
 
   // Derived killer logic: Killer is the one with the highest index (arbitrary but derived)

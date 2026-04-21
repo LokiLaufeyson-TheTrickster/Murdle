@@ -130,7 +130,7 @@ export const THEMES: Record<string, ThemeDef> = {
     ],
     weapons: [
       {
-        name: 'Gourmet Poisoned Espresso', icon: 'Syringe', color: '#8B4513',
+        name: 'Poisoned Espresso', icon: 'Syringe', color: '#8B4513',
         details: {
           description: "A ridiculously overpriced triple-shot flat white, topped with artisanal foam and a dash of untraceable paralytic. It was almost too pretty to drink. Almost.",
           weight: 'light', madeOf: 'suspiciously bitter liquid in a gold-rimmed ceramic cup',
@@ -138,7 +138,7 @@ export const THEMES: Record<string, ThemeDef> = {
         }
       },
       {
-        name: 'Polished Letter Opener', icon: 'Pen', color: '#B8860B',
+        name: 'Letter Opener', icon: 'Pen', color: '#B8860B',
         details: {
           description: "An antique brass instrument originally intended for opening bills, but it turns out it's quite efficient at closing accounts permanently.",
           weight: 'light', madeOf: 'hand-forged solid brass with an alarming point',
@@ -146,7 +146,7 @@ export const THEMES: Record<string, ThemeDef> = {
         }
       },
       {
-        name: 'Experimental USB Overloader', icon: 'Usb', color: '#333399',
+        name: 'USB Drive', icon: 'Usb', color: '#333399',
         details: {
           description: "Looking like a standard office-issue drive, this 'little helper' packs enough stored voltage to reboot a person instead of a computer.",
           weight: 'light', madeOf: 'brushed metal casing housing a lethal capacitor array',
@@ -154,7 +154,7 @@ export const THEMES: Record<string, ThemeDef> = {
         }
       },
       {
-        name: 'Heavy Crystal Award', icon: 'Layers', color: '#88AACC',
+        name: 'Crystal Award', icon: 'Layers', color: '#88AACC',
         details: {
           description: "A 'Manager of the Year' trophy. Ironically, it has now become the tool used to ensure there won't be a next year for the recipient.",
           weight: 'heavy', madeOf: 'solid lead crystal with dangerously sharp aesthetic edges',
@@ -162,7 +162,7 @@ export const THEMES: Record<string, ThemeDef> = {
         }
       },
       {
-        name: 'Bent Seven-Iron', icon: 'Wrench', color: '#888877',
+        name: 'Seven-Iron', icon: 'Wrench', color: '#888877',
         details: {
           description: "A golf club that has seen better days and more violent swings. The shaft is bent into a shape that would make any pro golfer weep and any detective take notes.",
           weight: 'heavy', madeOf: 'aerospace-grade titanium with a suspiciously damp rubber grip',
@@ -170,7 +170,7 @@ export const THEMES: Record<string, ThemeDef> = {
         }
       },
       {
-        name: 'Monogrammed Silk Tie', icon: 'Shirt', color: '#8B0000',
+        name: 'Silk Tie', icon: 'Shirt', color: '#8B0000',
         details: {
           description: "A 100% mulberry silk necktie that offers a luxurious feel and an even more luxurious lack of fingerprints. A silent, stylish farewell.",
           weight: 'light', madeOf: 'finely woven silk with reinforced double-stitching',
@@ -180,23 +180,23 @@ export const THEMES: Record<string, ThemeDef> = {
     ],
     locations: [
       {
-        name: 'The Panopticon Office', icon: 'Building2', color: '#334466',
+        name: 'Corner Office', icon: 'Building2', color: '#334466',
         details: { setting: 'indoor', descriptor: "A glass-walled monument to corporate ego, offering a 360-degree view of things that shouldn't be happening.", traceFeature: "a fine layer of expensive dust disturbed on the mahogany desk" }
       },
       {
-        name: 'The Humming Server Labyrinth', icon: 'Server', color: '#112233',
+        name: 'Server Room', icon: 'Server', color: '#112233',
         details: { setting: 'indoor', descriptor: "A freezing digital forest where the only sound is the constant, judgmental hum of a million processors.", traceFeature: "a faint scuff on the anti-static floor tiles near the coolant intake" }
       },
       {
-        name: 'Billionaire\'s Rooftop Garden', icon: 'Leaf', color: '#1a4a1a',
+        name: 'Rooftop Garden', icon: 'Leaf', color: '#1a4a1a',
         details: { setting: 'outdoor', descriptor: "A patch of manicured nature perched dangerously high above the city, where the air is thin and the secrets are thick.", traceFeature: "a crushed exotic fern and several displaced decorative pebbles" }
       },
       {
-        name: 'The Sub-Level Concrete Void', icon: 'ParkingSquare', color: '#444444',
+        name: 'Underground Parking', icon: 'ParkingSquare', color: '#444444',
         details: { setting: 'underground', descriptor: "A bleak expanse of gray where the echoes never quite find a way out and the light is always flickering.", traceFeature: "a fresh oil drip and a singular, frantic scuff of a rubber sole" }
       },
       {
-        name: 'The Dust-Choked Archive', icon: 'Archive', color: '#554433',
+        name: 'Archive Room', icon: 'Archive', color: '#554433',
         details: { setting: 'indoor', descriptor: "A forgotten catacomb of paperwork where the past is shelved alphabetically and left to slowly disintegrate.", traceFeature: "a disturbed stack of folders and a lingering scent of old parchment" }
       }
     ],
