@@ -50,6 +50,7 @@ export interface WeaponDetails {
   weight: 'heavy' | 'medium' | 'light';
   madeOf: string;           // e.g. "stainless steel"
   locationClue: string;     // What trace evidence is left at the scene
+  foundFingerprint?: string;
 }
 
 // ── Location attributes ────────────────────────────────────────────
@@ -57,6 +58,7 @@ export interface LocationDetails {
   setting: 'indoor' | 'outdoor' | 'underground';
   descriptor: string;       // Short atmospheric note
   traceFeature: string;     // Unique environmental feature used in clues (e.g. "vines")
+  foundShoeprint?: string;
 }
 
 export type EntityDetails = SuspectDetails | WeaponDetails | LocationDetails;

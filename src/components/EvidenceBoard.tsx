@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Fingerprint, Swords, MapPin, Weight, MapPinned, Trees, Building, Eye, Star, Sun, CircleUser, Sparkles, Binary } from 'lucide-react';
+import { X, Fingerprint, Swords, MapPin, Weight, Trees, Building, Eye, Sun, CircleUser, Sparkles, Binary } from 'lucide-react';
 import type { AssetInfo, SuspectDetails, WeaponDetails, LocationDetails } from '../engine/types';
 import { SUSPECT_ICONS, WEAPON_ICONS, LOCATION_ICONS } from '../engine/narrative';
 import { ProceduralPrint } from './ProceduralPrint';
@@ -96,6 +96,41 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
     }
     const IconComp = LOCATION_ICONS[item.icon] || LOCATION_ICONS['Wind'];
     return <IconComp size={size} style={{ color: item.color || '#00E5FF' }} />;
+  };
+
+  const renderComparison = (foundPattern: string, type: 'fingerprint' | 'shoeprint') => {
+    return (
+      <div className="forensic-comparison">
+        <div className="comparison-header mono">
+          <Binary size={14} /> FORENSIC COMPARISON MODULE
+        </div>
+        
+        <div className="comparison-layout">
+          <div className="recovered-sample glass-card">
+            <span className="mono label-tiny">RECOVERED TRACE</span>
+            <div className="print-box grayscale-box">
+              <ProceduralPrint seed={foundPattern} type={type} size={130} grayscale />
+            </div>
+            <span className="mono pattern-id">{foundPattern}</span>
+          </div>
+
+          <div className="suspect-grid-mini">
+            {suspects.map(s => {
+              const d = s.details as SuspectDetails;
+              const sPattern = type === 'fingerprint' ? d.fingerprintPattern : d.shoeprintPattern;
+              return (
+                <div key={s.name} className="suspect-mini-card">
+                  <div className="print-wrap">
+                    <ProceduralPrint seed={sPattern} type={type} size={50} color={s.color} />
+                  </div>
+                  <span className="mono mini-name">{s.name.split(' ')[0]}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -202,12 +237,16 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
                           <div className="trace-evidence-section">
                             <div className="evidence-item">
                               <span className="mono detail-label">BIOMETRIC: FINGERPRINT</span>
-                              <ProceduralPrint type="fingerprint" seed={d.fingerprintPattern} size={120} color={selectedAsset.color} />
+                              <div className="print-box">
+                                <ProceduralPrint type="fingerprint" seed={d.fingerprintPattern} size={110} color={selectedAsset.color} />
+                              </div>
                               <span className="mono pattern-id">{d.fingerprintPattern}</span>
                             </div>
                             <div className="evidence-item">
                               <span className="mono detail-label">FORENSIC: SHOEPRINT</span>
-                              <ProceduralPrint type="shoeprint" seed={d.shoeprintPattern} size={120} color={selectedAsset.color} />
+                              <div className="print-box">
+                                <ProceduralPrint type="shoeprint" seed={d.shoeprintPattern} size={110} color={selectedAsset.color} />
+                              </div>
                               <span className="mono pattern-id">{d.shoeprintPattern}</span>
                             </div>
                           </div>
@@ -230,8 +269,13 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
                         <>
                           <div className="detail-item">
                             <span className="mono detail-label">INTEL REPORT</span>
-                            <span className="detail-value">{d.description}</span>
+                            <span className="detail-value narrative-text">
+                              {d.description} Forensic sweeps of the scene noted {d.locationClue}.
+                            </span>
                           </div>
+
+                          {d.foundFingerprint && renderComparison(d.foundFingerprint, 'fingerprint')}
+
                           <div className="attr-grid-container">
                             <div className="attr-chip-modern">
                               <span className="attr-label mono"><Weight size={12} /> WEIGHT</span>
@@ -241,10 +285,6 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
                               <span className="attr-label mono"><Binary size={12} /> COMPOSITION</span>
                               <span className="attr-val">{d.madeOf}</span>
                             </div>
-                          </div>
-                          <div className="detail-item scene-clue-premium">
-                            <span className="mono detail-label"><MapPinned size={15} style={{marginRight:8}}/> SCENE TRACE</span>
-                            <span className="detail-value scene-trace">{d.locationClue}</span>
                           </div>
                         </>
                       );
@@ -256,12 +296,12 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
                         <>
                           <div className="detail-item">
                             <span className="mono detail-label">SURVEILLANCE LOG</span>
-                            <span className="detail-value">{d.descriptor}</span>
+                            <span className="detail-value narrative-text">
+                              {d.descriptor} The environment exhibits {d.traceFeature}, which has been logged for forensic matching.
+                            </span>
                           </div>
-                          <div className="detail-item scene-clue-premium">
-                            <span className="mono detail-label"><Star size={15} style={{marginRight:8}}/> DISTINGUISHING FEATURE</span>
-                            <span className="detail-value scene-trace">{d.traceFeature}</span>
-                          </div>
+
+                          {d.foundShoeprint && renderComparison(d.foundShoeprint, 'shoeprint')}
                         </>
                       );
                     })()}
@@ -335,7 +375,8 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
         }
 
         .asset-details-pane { flex: 1; padding: 40px; overflow-y: auto; }
-        .details-hero { display: flex; align-items: flex-start; gap: 32px; margin-bottom: 40px; }
+        .details-content { display: flex; flex-direction: column; gap: 32px; }
+        .details-hero { display: flex; align-items: flex-start; gap: 32px; }
         .details-hero-icon {
           padding: 24px; background: rgba(0,0,0,0.3); border-radius: 20px;
           border: 1px solid var(--border-bright); flex-shrink: 0;
@@ -349,10 +390,13 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
         .badge-modern.grey { background: rgba(255,255,255,0.05); color: var(--text-dim); }
         .badge-modern.outline { border: 1px solid var(--accent-primary); color: var(--accent-primary); }
 
-        .dossier-section { margin-bottom: 32px; }
+        .dossier-section { margin-bottom: 24px; }
         .backstory-display {
           font-size: 1.1rem; line-height: 1.8; color: var(--text-dim);
           font-style: italic; font-family: 'Outfit', sans-serif;
+        }
+        .narrative-text {
+          font-size: 1rem; line-height: 1.7; color: var(--text-main); font-weight: 400;
         }
 
         .trace-evidence-section {
@@ -361,9 +405,40 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
         .evidence-item {
           flex: 1; display: flex; flex-direction: column; gap: 10px; align-items: center;
           background: rgba(255,255,255,0.02); border: 1px solid var(--border-dim);
-          padding: 16px; border-radius: 12px;
+          padding: 20px; border-radius: 12px;
         }
-        .pattern-id { font-size: 0.6rem; opacity: 0.4; letter-spacing: 1px; }
+        .print-box {
+          background: rgba(0,0,0,0.4); border-radius: 8px; padding: 8px;
+          box-shadow: inset 0 0 15px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05);
+        }
+        .pattern-id { font-size: 0.55rem; opacity: 0.3; letter-spacing: 1px; }
+
+        .forensic-comparison {
+          background: rgba(0,210,255,0.03); border: 1px solid rgba(0,210,255,0.2);
+          border-radius: 12px; overflow: hidden; margin-bottom: 32px;
+        }
+        .comparison-header {
+          background: rgba(0,210,255,0.1); padding: 8px 16px; font-size: 0.65rem;
+          letter-spacing: 3px; color: var(--accent-primary); display: flex; align-items: center; gap: 8px;
+        }
+        .comparison-layout { display: flex; padding: 20px; gap: 24px; }
+        .recovered-sample {
+          width: 180px; display: flex; flex-direction: column; align-items: center; gap: 12px;
+          background: rgba(0,0,0,0.2); padding: 16px; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .grayscale-box { filter: contrast(1.2) brightness(0.8); }
+        
+        .suspect-grid-mini {
+          flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+          gap: 12px; align-content: start;
+        }
+        .suspect-mini-card {
+          display: flex; flex-direction: column; align-items: center; gap: 6px;
+          padding: 8px; background: rgba(255,255,255,0.02); border-radius: 6px;
+          border: 1px solid transparent; transition: all 0.2s; position: relative;
+        }
+        .print-wrap { background: rgba(0,0,0,0.3); border-radius: 4px; padding: 4px; }
+        .mini-name { font-size: 0.55rem; color: var(--text-dim); text-align: center; }
 
         .attr-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
         .attr-chip-modern {
@@ -373,10 +448,7 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
         .attr-label { color: var(--accent-primary); font-size: 0.65rem; letter-spacing: 2px; display: flex; align-items: center; gap: 6px; }
         .attr-val { color: var(--text-main); font-size: 1rem; font-weight: 600; }
 
-        .scene-clue-premium {
-          margin-top: 24px; padding: 24px; background: rgba(0,210,255,0.04);
-          border-left: 4px solid var(--accent-primary); border-radius: 4px;
-        }
+        .label-tiny { font-size: 0.5rem; color: var(--accent-primary); opacity: 0.8; letter-spacing: 2px; }
         .detail-label { color: var(--accent-primary); font-size: 0.7rem; font-weight: 800; letter-spacing: 4px; margin-bottom: 12px; display: block; }
         
         @media (max-width: 900px) {
@@ -385,6 +457,8 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
           .asset-grid { width: 100%; border-right: none; height: 180px; flex-shrink: 0; display: flex; overflow-x: auto; }
           .asset-card { min-width: 120px; aspect-ratio: unset; flex-shrink: 0; }
           .evidence-content { flex-direction: column; }
+          .comparison-layout { flex-direction: column; }
+          .recovered-sample { width: 100%; }
         }
       `}} />
     </motion.div>

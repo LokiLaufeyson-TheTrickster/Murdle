@@ -5,10 +5,12 @@ interface ProceduralPrintProps {
   type: 'fingerprint' | 'shoeprint';
   color?: string;
   size?: number;
+  grayscale?: boolean;
 }
 
-export const ProceduralPrint: React.FC<ProceduralPrintProps> = ({ seed, type, color = 'var(--accent-primary)', size = 100 }) => {
+export const ProceduralPrint: React.FC<ProceduralPrintProps> = ({ seed, type, color = 'var(--accent-primary)', size = 100, grayscale = false }) => {
   if (!seed) return null;
+  const activeColor = grayscale ? '#888888' : color;
 
   // Simple deterministic random from seed string
   const hashString = (s: string) => {
@@ -43,7 +45,7 @@ export const ProceduralPrint: React.FC<ProceduralPrintProps> = ({ seed, type, co
           rx={radiusX}
           ry={radiusY}
           fill="none"
-          stroke={color}
+          stroke={activeColor}
           strokeWidth="1.5"
           strokeDasharray={`${20 + (n % 20)} ${10 + (i % 5)}`}
           style={{ opacity: 0.6 - (i * 0.05) }}
@@ -63,11 +65,11 @@ export const ProceduralPrint: React.FC<ProceduralPrintProps> = ({ seed, type, co
         const shapeType = hashString(subSeed) % 3;
         
         if (shapeType === 0) {
-          paths.push(<rect key={`${x}-${y}`} x={posX} y={posY} width={step*0.6} height={step*0.3} rx={2} fill={color} style={{ opacity: 0.4 }} />);
+          paths.push(<rect key={`${x}-${y}`} x={posX} y={posY} width={step*0.6} height={step*0.3} rx={2} fill={activeColor} style={{ opacity: 0.4 }} />);
         } else if (shapeType === 1) {
-          paths.push(<circle key={`${x}-${y}`} cx={posX} cy={posY} r={step*0.2} fill={color} style={{ opacity: 0.4 }} />);
+          paths.push(<circle key={`${x}-${y}`} cx={posX} cy={posY} r={step*0.2} fill={activeColor} style={{ opacity: 0.4 }} />);
         } else {
-          paths.push(<path key={`${x}-${y}`} d={`M ${posX} ${posY} L ${posX+step*0.4} ${posY+step*0.4}`} stroke={color} strokeLinecap="round" strokeWidth="2" style={{ opacity: 0.4 }} />);
+          paths.push(<path key={`${x}-${y}`} d={`M ${posX} ${posY} L ${posX+step*0.4} ${posY+step*0.4}`} stroke={activeColor} strokeLinecap="round" strokeWidth="2" style={{ opacity: 0.4 }} />);
         }
       }
     }

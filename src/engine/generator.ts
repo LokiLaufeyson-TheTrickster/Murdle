@@ -1,4 +1,4 @@
-import type { LogicState, Clue, Difficulty, Puzzle, SuspectDetails } from './types';
+import type { LogicState, Clue, Difficulty, Puzzle, SuspectDetails, WeaponDetails, LocationDetails } from './types';
 import { solve, seededRandom } from './solver';
 import { THEMES, PROFESSIONS } from './narrative';
 
@@ -40,6 +40,21 @@ export function generatePuzzle(seed: string, difficulty: Difficulty, size: numbe
   const wlTruth = SHUFFLE(Array.from({ length: size }, (_, i) => i), rng);
   const slTruth = swTruth.map(wIdx => wlTruth[wIdx]);
   const solution: LogicState = { sw: swTruth, wl: wlTruth, sl: slTruth };
+
+  // Assign trace evidence based on truth
+  suspects.forEach((s, i) => {
+    const sDetails = s.details as SuspectDetails;
+    
+    // Weapon used by suspect i
+    const weaponIdx = swTruth[i];
+    const wDetails = weapons[weaponIdx].details as WeaponDetails;
+    wDetails.foundFingerprint = sDetails.fingerprintPattern;
+
+    // Location where suspect i was
+    const locationIdx = slTruth[i];
+    const lDetails = locations[locationIdx].details as LocationDetails;
+    lDetails.foundShoeprint = sDetails.shoeprintPattern;
+  });
 
   // Derived killer logic: Killer is the one with the highest index (arbitrary but derived)
   const murdererIdx = (seed.length + seed.charCodeAt(0)) % size;
