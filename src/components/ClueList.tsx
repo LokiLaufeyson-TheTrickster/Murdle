@@ -450,6 +450,56 @@ export const ClueList: React.FC<ClueListProps> = ({
         .typewriter { font-family: 'JetBrains Mono', monospace !important; font-size: 0.82rem !important; line-height: 1.6 !important; color: var(--text-main); font-weight: 400; letter-spacing: 0.3px; }
         .logic-reveal { margin-top: 12px; font-size: 0.75rem; font-weight: 700; color: var(--success); background: rgba(0, 255, 163, 0.05); padding: 6px 10px; border-radius: 4px; border-left: 2px solid var(--success); letter-spacing: 0.5px; }
         .icon-pulse { animation: pulse 2s infinite; color: var(--accent-primary); }
+        
+        .toggle-logic {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          border-radius: 6px;
+          background: rgba(255,255,255,0.02);
+          border: 1px solid var(--border-dim);
+          color: var(--text-dim);
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 0.65rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          letter-spacing: 1px;
+          text-transform: uppercase;
+        }
+        .toggle-logic:hover {
+          background: rgba(255,255,255,0.08);
+          border-color: var(--border-bright);
+          color: var(--text-bright);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .toggle-logic.active {
+          background: rgba(0, 210, 255, 0.1);
+          border-color: var(--accent-primary);
+          color: var(--accent-primary);
+          box-shadow: 0 0 15px rgba(0, 210, 255, 0.15);
+        }
+        .ai-toggle {
+          border-color: rgba(157, 80, 187, 0.3);
+        }
+        .ai-toggle.active {
+          background: rgba(157, 80, 187, 0.1);
+          border-color: var(--accent-secondary);
+          color: var(--accent-secondary);
+          box-shadow: 0 0 15px rgba(157, 80, 187, 0.15);
+        }
+        .toggle-logic:active {
+          transform: translateY(0);
+        }
+        .toggle-logic span {
+          display: inline-block;
+        }
+        @media (max-width: 450px) {
+          .toggle-logic span { display: none; }
+          .toggle-logic { padding: 6px; }
+        }
       `}} />
     </div>
   );
