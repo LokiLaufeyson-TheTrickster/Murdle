@@ -19,7 +19,14 @@ export type ClueType =
   | 'NEGATIVE'          // S_i does not have W_j
   | 'TRANSITIVE'        // S_i was at L_k (implies SW_i_j AND WL_j_k)
   | 'LOCATION_WEAPON'   // W_j is at L_k
-  | 'SUSPECT_LOCATION'; // S_i is at L_k
+  | 'SUSPECT_LOCATION'  // S_i is at L_k
+  | 'FORENSIC_SW'       // S_i's print on W_j
+  | 'FORENSIC_SL';       // S_i's tread at L_k
+
+export type ClueMetadata = {
+  pattern?: string;
+  type?: 'fingerprint' | 'shoeprint';
+};
 
 export type Clue = {
   id: string;
@@ -28,6 +35,7 @@ export type Clue = {
   isNegative: boolean;
   text: string;
   logicDisplay?: string;
+  metadata?: ClueMetadata;
 };
 
 // ── Suspect attributes ────────────────────────────────────────────

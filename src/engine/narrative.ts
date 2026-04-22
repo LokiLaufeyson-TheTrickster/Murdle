@@ -339,7 +339,22 @@ export function getNarrative(clue: any, suspects: any[], weapons: any[], locatio
 
   const lookupType = type === 'NEGATIVE' ? 'DIRECT' : type;
   let pool: string[] = [];
-  if (lookupType === 'DIRECT') pool = isNegative ? MASTER_TEMPLATES.SW.neg : MASTER_TEMPLATES.SW.pos;
+  
+  if (lookupType === 'FORENSIC_SW') {
+    pool = [
+      "A partial {fingerprint} was lifted from the surface of the {W}. {This} matches a suspect in our database.",
+      "Forensics found {this} suspicious {fingerprint} smeared on the {W}.",
+      "The crime lab identifies {this} {fingerprint} found on the {W} as belonging to the killer.",
+      "Analysis of the {W} reveals {this} specific {fingerprint} near the grip."
+    ];
+  } else if (lookupType === 'FORENSIC_SL') {
+    pool = [
+      "Analysts discovered {this} {shoeprint} impressed upon the floor of the {L}.",
+      "A distinct {shoeprint} was recovered from the {L}. Use {this} image for comparison.",
+      "The {L} contained {this} unique {shoeprint} near the primary point of entry.",
+      "A witness saw a figure leaving {this} {shoeprint} behind in the {L}."
+    ];
+  } else if (lookupType === 'DIRECT') pool = isNegative ? MASTER_TEMPLATES.SW.neg : MASTER_TEMPLATES.SW.pos;
   else if (lookupType === 'LOCATION_WEAPON') pool = isNegative ? MASTER_TEMPLATES.WL.neg : MASTER_TEMPLATES.WL.pos;
   else if (lookupType === 'SUSPECT_LOCATION') pool = isNegative ? MASTER_TEMPLATES.SL.neg : MASTER_TEMPLATES.SL.pos;
 
@@ -348,11 +363,14 @@ export function getNarrative(clue: any, suspects: any[], weapons: any[], locatio
   const sentenceTemplate = pool[Math.floor(Math.random() * pool.length)];
   
   // Clean up potential "double the" by checking the template and trait
-  // We'll replace {S}, {W}, {L} and then fix any "the the" patterns
   let final = sentenceTemplate
     .replace(/{S}/g, getS())
     .replace(/{W}/g, getW())
-    .replace(/{L}/g, getL());
+    .replace(/{L}/g, getL())
+    .replace(/{fingerprint}/g, "fingerprint")
+    .replace(/{shoeprint}/g, "shoeprint")
+    .replace(/{this}/g, "{This}")
+    .replace(/{This}/g, "{This}");
     
   // Sanitize "the the" or "The the" to just "the" or "The"
   final = final.replace(/[Tt]he [Tt]he/g, (match) => match.split(' ')[0]);
