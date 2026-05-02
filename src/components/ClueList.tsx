@@ -272,7 +272,6 @@ export const ClueList: React.FC<ClueListProps> = ({
         </AnimatePresence>
       </div>
 
-      </AnimatePresence>
 
       <style dangerouslySetInnerHTML={{ __html: `
         .clue-list-container {

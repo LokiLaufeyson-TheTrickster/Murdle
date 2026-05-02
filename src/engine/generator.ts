@@ -21,7 +21,7 @@ export function generatePuzzle(seed: string, difficulty: Difficulty, size: numbe
   const locations = SHUFFLE(theme.locations, rng).slice(0, size);
 
   // Assign backstories from pools
-  suspects.forEach((s, idx) => {
+  suspects.forEach((s) => {
     const details = s.details as SuspectDetails;
     const prof = details.profession;
     const backstories = PROFESSIONS[prof] || ["A mysterious past shrouded in secrets."];
