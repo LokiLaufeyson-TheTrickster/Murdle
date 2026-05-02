@@ -26,21 +26,7 @@ export function generatePuzzle(seed: string, difficulty: Difficulty, size: numbe
     const prof = details.profession;
     const backstories = PROFESSIONS[prof] || ["A mysterious past shrouded in secrets."];
     details.backstory = backstories[Math.floor(rng() * backstories.length)];
-    
-    // Procedural Print Generation
-    const patterns = ['Ulnar Loop', 'Radial Loop', 'Plain Whorl', 'Central Pocket Loop', 'Double Loop Whorl', 'Accidental Whorl', 'Plain Arch', 'Tented Arch'];
-    
-    // Choose shoe based on gender/persona
-    const shoeTypePool = details.gender === 'female' ? ['Stiletto', 'Pump', 'Sneaker', 'Loafer'] : 
-                         details.gender === 'male' ? ['Lug Sole Boot', 'Work Boot', 'Oxford', 'Sneaker'] :
-                         ['Sneaker', 'Loafer', 'Hiking Boot', 'Slip-on'];
-    
-    const pattern = patterns[Math.floor(rng() * patterns.length)];
-    const shoe = shoeTypePool[Math.floor(rng() * shoeTypePool.length)];
-
-    details.fingerprintPattern = `${pattern} (${seed.slice(0, 2)}-${idx})`;
-    details.shoeprintPattern = `${shoe} (${seed.slice(-2)}-${idx})`;
-  });
+    });
 
   // 2. Generate Truth
   const swTruth = SHUFFLE(Array.from({ length: size }, (_, i) => i), rng);
@@ -50,32 +36,13 @@ export function generatePuzzle(seed: string, difficulty: Difficulty, size: numbe
 
   // Derived killer logic: Killer is the one with the highest index (arbitrary but derived)
   const murdererIdx = (seed.length + seed.charCodeAt(0)) % size;
-
+    
   // 3. Clue Pool Generation
   const allPossibleClues: Clue[] = [];
   const addClue = (type: any, variables: any[], isNegative: boolean) => {
-    let finalType = type;
-    let metadata: any = undefined;
-
-    // Occasionally convert a DIRECT (SW) or SUSPECT_LOCATION (SL) clue into a Forensic one
-    // Only for positive clues for now, to follow player request ("This print belongs to...")
-    if (!isNegative) {
-      if (type === 'DIRECT' && rng() < 0.4) {
-        const sIdx = variables[0].i;
-        const sDetails = suspects[sIdx].details as SuspectDetails;
-        finalType = 'FORENSIC_SW';
-        metadata = { pattern: sDetails.fingerprintPattern, type: 'fingerprint' };
-      } else if (type === 'SUSPECT_LOCATION' && rng() < 0.4) {
-        const sIdx = variables[0].i;
-        const sDetails = suspects[sIdx].details as SuspectDetails;
-        finalType = 'FORENSIC_SL';
-        metadata = { pattern: sDetails.shoeprintPattern, type: 'shoeprint' };
-      }
-    }
-
     allPossibleClues.push({
-      id: `${finalType}-${variables.map(v => `${v.i || v.j}-${v.j || v.k}`).join('-')}-${isNegative}-${rng()}`,
-      type: finalType, variables, isNegative, text: '', metadata
+      id: `${type}-${variables.map(v => `${v.i || v.j}-${v.j || v.k}`).join('-')}-${isNegative}-${rng()}`,
+      type, variables, isNegative, text: ''
     });
   };
 

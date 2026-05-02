@@ -19,14 +19,7 @@ export type ClueType =
   | 'NEGATIVE'          // S_i does not have W_j
   | 'TRANSITIVE'        // S_i was at L_k (implies SW_i_j AND WL_j_k)
   | 'LOCATION_WEAPON'   // W_j is at L_k
-  | 'SUSPECT_LOCATION'  // S_i is at L_k
-  | 'FORENSIC_SW'       // S_i's print on W_j
-  | 'FORENSIC_SL';       // S_i's tread at L_k
-
-export type ClueMetadata = {
-  pattern?: string;
-  type?: 'fingerprint' | 'shoeprint';
-};
+  | 'SUSPECT_LOCATION';  // S_i is at L_k
 
 export type Clue = {
   id: string;
@@ -35,7 +28,6 @@ export type Clue = {
   isNegative: boolean;
   text: string;
   logicDisplay?: string;
-  metadata?: ClueMetadata;
 };
 
 // ── Suspect attributes ────────────────────────────────────────────
@@ -48,8 +40,6 @@ export interface SuspectDetails {
   eyeColor: string;         // e.g. "hazel"
   hairColor: string;        // e.g. "auburn"
   handedness: 'left-handed' | 'right-handed';
-  fingerprintPattern?: string; // Procedurally generated pattern ID
-  shoeprintPattern?: string;   // Procedurally generated pattern ID
 }
 
 // ── Weapon attributes ─────────────────────────────────────────────
@@ -58,7 +48,6 @@ export interface WeaponDetails {
   weight: 'heavy' | 'medium' | 'light';
   madeOf: string;           // e.g. "stainless steel"
   locationClue: string;     // What trace evidence is left at the scene
-  foundFingerprint?: string;
 }
 
 // ── Location attributes ────────────────────────────────────────────
@@ -66,7 +55,6 @@ export interface LocationDetails {
   setting: 'indoor' | 'outdoor' | 'underground';
   descriptor: string;       // Short atmospheric note
   traceFeature: string;     // Unique environmental feature used in clues (e.g. "vines")
-  foundShoeprint?: string;
 }
 
 export type EntityDetails = SuspectDetails | WeaponDetails | LocationDetails;

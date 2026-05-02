@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Fingerprint, Swords, MapPin, Weight, Trees, Building, Eye, Sun, CircleUser, Sparkles, Binary } from 'lucide-react';
+import { X, Swords, MapPin, Weight, Trees, Building, Eye, Sun, CircleUser, Sparkles, Binary } from 'lucide-react';
 import type { AssetInfo, SuspectDetails, WeaponDetails, LocationDetails } from '../engine/types';
 import { SUSPECT_ICONS, WEAPON_ICONS, LOCATION_ICONS } from '../engine/narrative';
-import { ProceduralPrint } from './ProceduralPrint';
 
 interface EvidenceBoardProps {
   suspects: AssetInfo[];
@@ -110,7 +109,7 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
       <div className="evidence-board-container glass-card" onClick={e => e.stopPropagation()}>
         <div className="evidence-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Fingerprint size={20} color="var(--accent-primary)" />
+            <Binary size={20} color="var(--accent-primary)" />
             <h2 className="mono">CENTRAL DATABASE</h2>
           </div>
           <button className="close-btn" onClick={onClose}><X size={22} /></button>
@@ -141,7 +140,7 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
               >
                 <div className="asset-icon-wrapper" style={{ borderColor: asset.color }}>
                    {(() => {
-                      const IconComp = (activeTab === 'suspects' ? SUSPECT_ICONS[asset.icon] : activeTab === 'weapons' ? WEAPON_ICONS[asset.icon] : LOCATION_ICONS[asset.icon]) || Fingerprint;
+                      const IconComp = (activeTab === 'suspects' ? SUSPECT_ICONS[asset.icon] : activeTab === 'weapons' ? WEAPON_ICONS[asset.icon] : LOCATION_ICONS[asset.icon]) || Binary;
                       return <IconComp size={32} style={{ color: asset.color }} />;
                    })()}
                 </div>
@@ -191,7 +190,7 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
                         { label: 'SUN SIGN', val: d.sunSign, icon: <Sun size={12} /> },
                         { label: 'EYE COLOR', val: d.eyeColor, icon: <Eye size={12} /> },
                         { label: 'HAIR', val: d.hairColor, icon: <Sparkles size={12} /> },
-                        { label: 'HAND', val: d.handedness, icon: <Fingerprint size={12} /> }
+                        { label: 'HAND', val: d.handedness, icon: <Binary size={12} /> }
                       ];
                       return (
                         <>
@@ -207,34 +206,6 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
                                 <span className="attr-val">{a.val}</span>
                               </div>
                             ))}
-                          </div>
-
-                          <div className="detail-item dossier-section" style={{ marginTop: '32px' }}>
-                            <span className="mono detail-label">FORENSIC PROFILES</span>
-                            <div className="trace-evidence-section">
-                              <div className="evidence-item">
-                                <div className="print-box">
-                                  <ProceduralPrint 
-                                    seed={d.fingerprintPattern} 
-                                    type="fingerprint" 
-                                    size={120} 
-                                    color={selectedAsset.color} 
-                                  />
-                                </div>
-                                <div className="mono pattern-id">DIGITAL DERMATOGLYPHIC: {d.fingerprintPattern}</div>
-                              </div>
-                              <div className="evidence-item">
-                                <div className="print-box">
-                                  <ProceduralPrint 
-                                    seed={d.shoeprintPattern} 
-                                    type="shoeprint" 
-                                    size={120} 
-                                    color={selectedAsset.color} 
-                                  />
-                                </div>
-                                <div className="mono pattern-id">TREAD GEOMETRY: {d.shoeprintPattern}</div>
-                              </div>
-                            </div>
                           </div>
                         </>
                       );
@@ -371,20 +342,6 @@ export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ suspects, weapons,
         .narrative-text {
           font-size: 1rem; line-height: 1.7; color: var(--text-main); font-weight: 400;
         }
-
-        .trace-evidence-section {
-          display: flex; gap: 20px; margin-bottom: 32px;
-        }
-        .evidence-item {
-          flex: 1; display: flex; flex-direction: column; gap: 10px; align-items: center;
-          background: rgba(255,255,255,0.02); border: 1px solid var(--border-dim);
-          padding: 20px; border-radius: 12px;
-        }
-        .print-box {
-          background: rgba(0,0,0,0.4); border-radius: 8px; padding: 8px;
-          box-shadow: inset 0 0 15px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05);
-        }
-        .pattern-id { font-size: 0.55rem; opacity: 0.3; letter-spacing: 1px; }
 
         .attr-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
         .attr-chip-modern {

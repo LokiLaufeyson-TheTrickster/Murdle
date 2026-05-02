@@ -207,7 +207,7 @@ export const THEMES: Record<string, ThemeDef> = {
 const setupMasterTemplates = () => {
   const S_W_POS = [
     "A witness observed {S} juggling the {W} with suspicious enthusiasm.",
-    "A series of distinct fingerprints belonging to {S} were mapped across the {W}.",
+    "A personal item belonging to {S} was found snagged on the {W}.",
     "According to a confidential informant, {S} was seen polishing the {W} just before the lights went out.",
     "Security footage clearly shows {S} skipping away from the scene, dropping the {W} into a nearby bin.",
     "The {W} was found wrapped in a handkerchief belonging to {S}.",
@@ -259,7 +259,7 @@ const setupMasterTemplates = () => {
 
   const S_L_POS = [
     "A disgruntled barista recalls serving a very nervous {S} in the {L}.",
-    "A magnificent, high-definition shoeprint matching {S} was found in the {L}.",
+    "A witness reported seeing {S} lurking near the entrance of the {L}.",
     "CCTV captured {S} doing what appeared to be a victory dance in the {L}.",
     "{S} left a personalized business card inside the {L} by mistake.",
     "A sample of DNA belonging to {S} was recovered from a discarded cup in the {L}.",
@@ -340,21 +340,7 @@ export function getNarrative(clue: any, suspects: any[], weapons: any[], locatio
   const lookupType = type === 'NEGATIVE' ? 'DIRECT' : type;
   let pool: string[] = [];
   
-  if (lookupType === 'FORENSIC_SW') {
-    pool = [
-      "A partial {fingerprint} was lifted from the surface of the {W}. {This} matches a suspect in our database.",
-      "Forensics found {this} suspicious {fingerprint} smeared on the {W}.",
-      "The crime lab identifies {this} {fingerprint} found on the {W} as belonging to the killer.",
-      "Analysis of the {W} reveals {this} specific {fingerprint} near the grip."
-    ];
-  } else if (lookupType === 'FORENSIC_SL') {
-    pool = [
-      "Analysts discovered {this} {shoeprint} impressed upon the floor of the {L}.",
-      "A distinct {shoeprint} was recovered from the {L}. Use {this} image for comparison.",
-      "The {L} contained {this} unique {shoeprint} near the primary point of entry.",
-      "A witness saw a figure leaving {this} {shoeprint} behind in the {L}."
-    ];
-  } else if (lookupType === 'DIRECT') pool = isNegative ? MASTER_TEMPLATES.SW.neg : MASTER_TEMPLATES.SW.pos;
+  if (lookupType === 'DIRECT') pool = isNegative ? MASTER_TEMPLATES.SW.neg : MASTER_TEMPLATES.SW.pos;
   else if (lookupType === 'LOCATION_WEAPON') pool = isNegative ? MASTER_TEMPLATES.WL.neg : MASTER_TEMPLATES.WL.pos;
   else if (lookupType === 'SUSPECT_LOCATION') pool = isNegative ? MASTER_TEMPLATES.SL.neg : MASTER_TEMPLATES.SL.pos;
 
@@ -366,11 +352,7 @@ export function getNarrative(clue: any, suspects: any[], weapons: any[], locatio
   let final = sentenceTemplate
     .replace(/{S}/g, getS())
     .replace(/{W}/g, getW())
-    .replace(/{L}/g, getL())
-    .replace(/{fingerprint}/g, "fingerprint")
-    .replace(/{shoeprint}/g, "shoeprint")
-    .replace(/{this}/g, "{This}")
-    .replace(/{This}/g, "{This}");
+    .replace(/{L}/g, getL());
     
   // Sanitize "the the" or "The the" to just "the" or "The"
   final = final.replace(/[Tt]he [Tt]he/g, (match) => match.split(' ')[0]);
